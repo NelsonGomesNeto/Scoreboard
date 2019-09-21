@@ -1,0 +1,11 @@
+<div style="padding: 10% 10% 10% 10%">
+  <mat-table #table [dataSource]="standings">
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+    <ng-container *ngFor="let column of columns; let colIndex = index" [matColumnDef]="column.columnDef">
+      <mat-header-cell *matHeaderCellDef>{{ column.header }}</mat-header-cell>
+      <mat-cell *matCellDef="let row">{{ column.cell(row, colIndex) }}</mat-cell>
+    </ng-container>
+    </mat-table>
+</div>
