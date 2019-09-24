@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Competidor } from '../model/competidor';
-import { RequestService } from '../request.service';
+import { RequestService } from '../service/request/request.service';
 import { DataSource } from '@angular/cdk/table';
 import { Observable } from 'rxjs';
 import { ProblemStatus } from '../model/problem-status';
-import { plainToClass } from 'class-transformer';
+import { ActivatedRoute } from '@angular/router';
+import { Competition } from '../model/competition';
 
 @Component({
   selector: 'app-standings',
@@ -15,22 +16,23 @@ export class StandingsComponent implements OnInit {
 
   displayedColumns: string[] = [];
   columns: object[] = [];
-  standings: Competidor[];
+  standings: Competition = new Competition(-1, '');
+  id = 0;
 
-  constructor(private server: RequestService) {
+  constructor(private server: RequestService, private activatedRoute: ActivatedRoute) {
   }
 
   ngOnInit() {
-    this.server.getStandings().subscribe((data: Competidor[]) => {
-
+    this.id = this.activatedRoute.snapshot.params['id'];
+    this.server.getStandings(this.id).subscribe((data: Competition) => {
       this.standings = data;
 
       this.displayedColumns.push('name');
       this.columns.push({columnDef: 'name', header: 'Name', cell: (c: Competidor) => c.name});
-      for (var i = 0; i < this.standings[0].problems.length; i ++) {
+      for (var i = 0; i < this.standings.problems.length; i ++) {
         let problemName = String.fromCharCode('A'.charCodeAt(0) + i);
         this.displayedColumns.push(problemName);
-        this.columns.push({columnDef: problemName, header: problemName, cell: (c: Competidor, i) => ProblemStatus.toString(c.problems[i - 1])});
+        this.columns.push({columnDef: problemName, header: problemName, cell: (c: Competidor, i: number) => ProblemStatus.toString(c.problemsStatus[i - 1])});
       }
       this.displayedColumns.push('score');
       this.columns.push({columnDef: 'score', header: 'Score', cell: (c: Competidor) => c.score});
@@ -38,15 +40,4 @@ export class StandingsComponent implements OnInit {
       console.log(this.standings);
     });
   }
-}
-
-export class StandingsDataSource extends DataSource<any> {
-  constructor(private server: RequestService) {
-    super();
-  }
-  connect(): Observable<any> {
-    console.log("connecting");
-    return this.server.getStandings();
-  }
-  disconnect() {}
 }

@@ -1,9 +1,8 @@
 class ProblemStatus {
 
-  constructor(id, submissions, accepted) {
-    this.id = id;
+  constructor(problemId, submissions) {
+    this.problemId = problemId;
     this.submissions = submissions;
-    this.accepted = accepted;
   }
 }
 

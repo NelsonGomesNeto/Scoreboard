@@ -1,1 +1,57 @@
-<p>admin works!</p>
+<div class='adminPanel'>
+  <mat-accordion>
+    <mat-expansion-panel *ngFor='let competition of competitions; let i = index'>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Name: {{competition.name}}, Id: {{competition.id}}
+        </mat-panel-title>
+        <mat-panel-description>
+          {{competition.competidors.length}} competidors and {{competition.problems.length}} problems
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+  
+      <!-- Problems list -->
+      <h3>Problems</h3>
+      <mat-card *ngFor='let problem of competition.problems; let j = index'>
+        <mat-card-title>
+          ProblemId: {{problem.id}}
+          <button mat-icon-button (click)='removeProblem(competition, j)' color='accent' class='remove-button'><mat-icon>remove</mat-icon></button>
+        </mat-card-title>
+      </mat-card>
+      <mat-card>
+        <mat-form-field>
+          <input matInput placeholder="problemId" name="problemId" [(ngModel)]="newProblemId" required>
+        </mat-form-field>
+        <button mat-raised-button (click)='addProblem(competition)' [disabled]='newProblemId == ""' color='accent'>Add Problem</button>
+      </mat-card>
+  
+      <!-- Competidors list -->
+      <h3>Competidors</h3>
+      <mat-card *ngFor='let competidor of competition.competidors; let j = index'>
+        <mat-card-title>
+          Name: {{competidor.name}}, Id: {{competidor.id}}
+          <button mat-icon-button (click)='removeCompetidor(competition, j)' color='accent' class='remove-button'><mat-icon>remove</mat-icon></button>
+        </mat-card-title>
+      </mat-card>
+      <mat-card>
+        <mat-form-field>
+          <input matInput placeholder="competidorId" name="competidorId" [(ngModel)]="newCompetidorId" required>
+        </mat-form-field>
+        ||
+        <mat-form-field>
+          <input matInput placeholder="competidorName" name="competidorName" [(ngModel)]="newCompetidorName" required>
+        </mat-form-field>
+        <button mat-raised-button (click)='addCompetidor(competition)' [disabled]='newCompetidorId == "" || newCompetidorName == ""' color='accent'>Add Competidor</button>
+      </mat-card>
+  
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-card>
+    <mat-form-field>
+      <input matInput placeholder="competitionName" name="competitionName" [(ngModel)]="newCompetitionName" required>
+    </mat-form-field>
+    <button mat-raised-button (click)='addCompetition()' [disabled]='newCompetitionName == ""' color='accent'>Add Competition</button>
+  </mat-card>
+  <button mat-raised-button (click)='logout()' color='accent'>Logout</button>
+</div>

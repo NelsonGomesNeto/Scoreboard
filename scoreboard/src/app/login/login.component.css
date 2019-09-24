@@ -1,0 +1,12 @@
+.login-container {
+  display: flex;
+  min-width: 150px;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 80%;
+  flex-direction: column;
+}
+
+.full-width {
+  width: 100%;
+}

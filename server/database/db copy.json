@@ -1,0 +1,78 @@
+{
+  "competitions": [
+    {
+      "id": 1,
+      "name": "1",
+      "competidors": [
+        
+      ],
+      "problems": [
+
+      ]
+    },
+    {
+      "id": 2,
+      "name": "2",
+      "competidors": [
+        {
+          "id": 1,
+          "name": "Nelson",
+          "score": 100,
+          "problemsStatus": [
+            {
+              "problemId": 1,
+              "submissions": [
+                {
+                  "date": "2019-09-24T11:09:27.502597",
+                  "verdict": "wrong answer"
+                }
+              ]
+            },
+            {
+              "problemId": 2,
+              "submissions": [
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "Jackson",
+          "score": 200,
+          "problemsStatus": [
+            {
+              "problemId": 1,
+              "submissions": [
+                {
+                  "date": "2019-09-24T11:09:26.502597",
+                  "verdict": "wrong answer"
+                },
+                {
+                  "date": "2019-09-24T11:09:27.502597",
+                  "verdict": "accepted"
+                }
+              ]
+            },
+            {
+              "problemId": 2,
+              "submissions": [
+                {
+                  "date": "2019-09-24T11:09:27.502597",
+                  "verdict": "accepted"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "problems": [
+        {
+          "id": 1
+        },
+        {
+          "id": 2
+        }
+      ]
+    }
+  ]
+}

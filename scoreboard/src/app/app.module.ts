@@ -7,13 +7,17 @@ import { StandingsComponent } from './standings/standings.component';
 import { AdminComponent } from './admin/admin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSortModule, MatTableModule, MatCommonModule } from '@angular/material';
+import { MatSortModule, MatTableModule, MatCommonModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatFormFieldControl, MatInputModule, MatButtonModule, MatExpansionModule, MatCardModule, MatIconModule, MatChipsModule } from '@angular/material';
+import { FormsModule } from '@angular/forms';
+import { LoginComponent } from './login/login.component';
+import { AuthenticationResolver } from './service/authentication/authentication-resolver';
 
 @NgModule({
    declarations: [
       AppComponent,
       StandingsComponent,
-      AdminComponent
+      AdminComponent,
+      LoginComponent
    ],
    imports: [
       BrowserModule,
@@ -23,8 +27,20 @@ import { MatSortModule, MatTableModule, MatCommonModule } from '@angular/materia
       MatTableModule,
       MatSortModule,
       MatCommonModule,
+      MatFormFieldModule,
+      MatInputModule,
+      MatButtonModule,
+      MatSelectModule,
+      MatOptionModule,
+      FormsModule,
+      MatExpansionModule,
+      MatCardModule,
+      MatIconModule,
+      MatChipsModule
    ],
-   providers: [],
+   providers: [
+      AuthenticationResolver
+   ],
    bootstrap: [
       AppComponent
    ]
