@@ -3,7 +3,7 @@ import { ProblemStatus } from './problem-status';
 export class Competidor {
   id: number;
   name: string;
-  score: number;
+  total: number;
   problemsStatus: ProblemStatus[];
 
   constructor(id: number, name: string) {

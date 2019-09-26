@@ -1,4 +1,9 @@
-<div style="padding: 10% 10% 10% 10%">
+<mat-card>
+  <mat-card-title>{{standings.name}}</mat-card-title>
+  <mat-card-subtitle>{{standings.startTime | date:'d/M/yy hh:mm z'}} to {{standings.endTime | date:'d/M/yy hh:mm z'}}</mat-card-subtitle>
+  <mat-progress-bar mode="determinate" [value]="progressBarValue"></mat-progress-bar>
+</mat-card>
+<div>
   <mat-table #table [dataSource]="standings.competidors">
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

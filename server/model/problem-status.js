@@ -1,6 +1,6 @@
 class ProblemStatus {
 
-  constructor(problemId, submissions) {
+  constructor(problemId, submissions = new Array()) {
     this.problemId = problemId;
     this.submissions = submissions;
   }

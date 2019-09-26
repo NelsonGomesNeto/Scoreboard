@@ -1,37 +1,63 @@
-<div class='adminPanel'>
+<div class='admin-panel'>
   <mat-accordion>
-    <mat-expansion-panel *ngFor='let competition of competitions; let i = index'>
-      <mat-expansion-panel-header>
+    <mat-expansion-panel *ngFor='let competition of competitions; let i = index' class='competition'>
+      <mat-expansion-panel-header [collapsedHeight]="'auto'">
         <mat-panel-title>
-          Name: {{competition.name}}, Id: {{competition.id}}
+          <br>
+          {{competition.name}}
+          <br>
         </mat-panel-title>
         <mat-panel-description>
-          {{competition.competidors.length}} competidors and {{competition.problems.length}} problems
+          {{competition.competidors.length}} competidors
+          <br>
+          {{competition.problems.length}} problems
+          <br>
+          {{competition.startTime | date:'d/M/yy hh:mm z'}} to {{competition.endTime | date:'d/M/yy hh:mm z'}}
         </mat-panel-description>
+        <button mat-icon-button (click)='removeCompetition(competition)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-expansion-panel-header>
-  
+
+      <!-- Date -->
+      <h3>Date</h3>
+      <mat-card>
+        <mat-form-field>
+          <input matInput placeholder="Start Date" [matDatepicker]="competitionStartDate" name="competitionStartDate" [(ngModel)]="newCompetitionStartDate" required>
+          <mat-datepicker-toggle matSuffix [for]="competitionStartDate"></mat-datepicker-toggle>
+          <mat-datepicker #competitionStartDate></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field style="width: 20%; padding-left: 5px;">
+          <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="Start Time" name="competitionStartTime" [(ngModel)]="newCompetitionStartTime" required>
+        </mat-form-field>
+        <br>
+        <mat-form-field>
+          <input matInput placeholder="End Date" [matDatepicker]="competitionEndDate" name="competitionEndDate" [(ngModel)]="newCompetitionEndDate" required>
+          <mat-datepicker-toggle matSuffix [for]="competitionEndDate"></mat-datepicker-toggle>
+          <mat-datepicker #competitionEndDate></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field style="width: 20%; padding-left: 5px;">
+          <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="End Time" name="competitionEndTime" [(ngModel)]="newCompetitionEndTime" required>
+        </mat-form-field>
+        <button mat-raised-button (click)='changeSchedule(competition)' [disabled]='invalidNewCompetition(false)' color='accent'>Change Schedule</button>
+      </mat-card>
+
       <!-- Problems list -->
       <h3>Problems</h3>
-      <mat-card *ngFor='let problem of competition.problems; let j = index'>
-        <mat-card-title>
-          ProblemId: {{problem.id}}
-          <button mat-icon-button (click)='removeProblem(competition, j)' color='accent' class='remove-button'><mat-icon>remove</mat-icon></button>
-        </mat-card-title>
+      <mat-card *ngFor='let problem of competition.problems; let j = index' class="card-list">
+        <h3>ProblemId: {{problem.id}}</h3>
+        <button mat-mini-fab (click)='removeProblem(competition, j)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-card>
       <mat-card>
         <mat-form-field>
           <input matInput placeholder="problemId" name="problemId" [(ngModel)]="newProblemId" required>
         </mat-form-field>
-        <button mat-raised-button (click)='addProblem(competition)' [disabled]='newProblemId == ""' color='accent'>Add Problem</button>
+        <button mat-raised-button (click)='addProblem(competition)' [disabled]='invalidNumber(newProblemId)' color='accent'>Add Problem</button>
       </mat-card>
   
       <!-- Competidors list -->
       <h3>Competidors</h3>
-      <mat-card *ngFor='let competidor of competition.competidors; let j = index'>
-        <mat-card-title>
-          Name: {{competidor.name}}, Id: {{competidor.id}}
-          <button mat-icon-button (click)='removeCompetidor(competition, j)' color='accent' class='remove-button'><mat-icon>remove</mat-icon></button>
-        </mat-card-title>
+      <mat-card *ngFor='let competidor of competition.competidors; let j = index' class="card-list">
+        <h3>Name: {{competidor.name}}, Id: {{competidor.id}}</h3>
+        <button mat-mini-fab (click)='removeCompetidor(competition, j)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-card>
       <mat-card>
         <mat-form-field>
@@ -43,15 +69,35 @@
         </mat-form-field>
         <button mat-raised-button (click)='addCompetidor(competition)' [disabled]='newCompetidorId == "" || newCompetidorName == ""' color='accent'>Add Competidor</button>
       </mat-card>
-  
+
+      <!-- <button mat-raised-button (click)='removeCompetition(competition)' color='accent'>Remove Competition</button> -->
     </mat-expansion-panel>
   </mat-accordion>
 
   <mat-card>
     <mat-form-field>
-      <input matInput placeholder="competitionName" name="competitionName" [(ngModel)]="newCompetitionName" required>
+      <input matInput placeholder="Competition Name" name="competitionName" [(ngModel)]="newCompetitionName" required>
     </mat-form-field>
-    <button mat-raised-button (click)='addCompetition()' [disabled]='newCompetitionName == ""' color='accent'>Add Competition</button>
+    <br>
+    <mat-form-field>
+      <input matInput placeholder="Start Date" [matDatepicker]="competitionStartDate" name="competitionStartDate" [(ngModel)]="newCompetitionStartDate" required>
+      <mat-datepicker-toggle matSuffix [for]="competitionStartDate"></mat-datepicker-toggle>
+      <mat-datepicker #competitionStartDate></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field style="width: 20%; padding-left: 5px;">
+      <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="Start Time" name="competitionStartTime" [(ngModel)]="newCompetitionStartTime" required>
+    </mat-form-field>
+    <br>
+    <mat-form-field>
+      <input matInput placeholder="End Date" [matDatepicker]="competitionEndDate" name="competitionEndDate" [(ngModel)]="newCompetitionEndDate" required>
+      <mat-datepicker-toggle matSuffix [for]="competitionEndDate"></mat-datepicker-toggle>
+      <mat-datepicker #competitionEndDate></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field style="width: 20%; padding-left: 5px;">
+      <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="End Time" name="competitionEndTime" [(ngModel)]="newCompetitionEndTime" required>
+    </mat-form-field>
+    <br>
+    <button mat-raised-button (click)='addCompetition()' [disabled]='invalidNewCompetition()' color='accent'>Add Competition</button>
   </mat-card>
   <button mat-raised-button (click)='logout()' color='accent'>Logout</button>
 </div>

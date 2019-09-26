@@ -17,15 +17,18 @@ export class StandingsComponent implements OnInit {
   displayedColumns: string[] = [];
   columns: object[] = [];
   standings: Competition = new Competition(-1, '');
+  time: Date = new Date();
   id = 0;
+  progressBarValue = 0;
 
   constructor(private server: RequestService, private activatedRoute: ActivatedRoute) {
   }
 
   ngOnInit() {
     this.id = this.activatedRoute.snapshot.params['id'];
-    this.server.getStandings(this.id).subscribe((data: Competition) => {
-      this.standings = data;
+    this.server.getStandings(this.id).subscribe((data: any) => {
+      this.standings = Competition.parse(data.standings);
+      this.time = new Date(data.time);
 
       this.displayedColumns.push('name');
       this.columns.push({columnDef: 'name', header: 'Name', cell: (c: Competidor) => c.name});
@@ -34,10 +37,10 @@ export class StandingsComponent implements OnInit {
         this.displayedColumns.push(problemName);
         this.columns.push({columnDef: problemName, header: problemName, cell: (c: Competidor, i: number) => ProblemStatus.toString(c.problemsStatus[i - 1])});
       }
-      this.displayedColumns.push('score');
-      this.columns.push({columnDef: 'score', header: 'Score', cell: (c: Competidor) => c.score});
+      this.displayedColumns.push('total');
+      this.columns.push({columnDef: 'total', header: 'Total', cell: (c: Competidor) => c.total});
 
-      console.log(this.standings);
+      this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
     });
   }
 }

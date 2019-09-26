@@ -1,9 +1,9 @@
 class Competidor {
 
-  constructor(id, name, score = 0, problemsStatus = new Array()) {
+  constructor(id, name, total = 0, problemsStatus = new Array()) {
     this.id = id;
     this.name = name;
-    this.score = score;
+    this.total = total;
     this.problemsStatus = problemsStatus;
   }
 }

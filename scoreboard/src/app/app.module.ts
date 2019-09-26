@@ -7,17 +7,20 @@ import { StandingsComponent } from './standings/standings.component';
 import { AdminComponent } from './admin/admin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSortModule, MatTableModule, MatCommonModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatFormFieldControl, MatInputModule, MatButtonModule, MatExpansionModule, MatCardModule, MatIconModule, MatChipsModule } from '@angular/material';
+import { MatSortModule, MatTableModule, MatCommonModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatFormFieldControl, MatInputModule, MatButtonModule, MatExpansionModule, MatCardModule, MatIconModule, MatChipsModule, MatDatepickerModule, MatNativeDateModule, MatProgressBarModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationResolver } from './service/authentication/authentication-resolver';
+import { AmazingTimePickerModule } from 'amazing-time-picker';
+import { CompetitionsComponent } from './competitions/competitions.component';
 
 @NgModule({
    declarations: [
       AppComponent,
       StandingsComponent,
       AdminComponent,
-      LoginComponent
+      LoginComponent,
+      CompetitionsComponent
    ],
    imports: [
       BrowserModule,
@@ -27,8 +30,8 @@ import { AuthenticationResolver } from './service/authentication/authentication-
       MatTableModule,
       MatSortModule,
       MatCommonModule,
-      MatFormFieldModule,
       MatInputModule,
+      MatFormFieldModule,
       MatButtonModule,
       MatSelectModule,
       MatOptionModule,
@@ -36,7 +39,11 @@ import { AuthenticationResolver } from './service/authentication/authentication-
       MatExpansionModule,
       MatCardModule,
       MatIconModule,
-      MatChipsModule
+      MatChipsModule,
+      MatDatepickerModule,
+      MatNativeDateModule,
+      AmazingTimePickerModule,
+      MatProgressBarModule
    ],
    providers: [
       AuthenticationResolver

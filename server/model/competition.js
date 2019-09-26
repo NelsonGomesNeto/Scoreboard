@@ -1,22 +1,12 @@
 class Competition {
 
-  constructor(id, name, competidors = new Array(), problems = new Array()) {
+  constructor(id, name, startTime = Date.now(), endTime = Date.now(), competidors = new Array(), problems = new Array()) {
     this.id = id;
     this.name = name;
+    this.startTime = startTime;
+    this.endTime = endTime;
     this.competidors = competidors;
     this.problems = problems;
-  }
-
-  addCompetidors(competidors) {
-    competidors.forEach(c => {
-      this.competidors.push(c);
-    });
-  }
-
-  addProblems(problems) {
-    problems.forEach(p => {
-      this.problems.push(p);
-    });
   }
 }
 

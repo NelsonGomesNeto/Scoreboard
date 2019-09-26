@@ -4,16 +4,9 @@ export class ProblemStatus {
   problemId: number;
   submissions: Submission[];
 
-  constructor(problemId: number, submissions?: Submission[]) {
+  constructor(problemId: number, submissions: Submission[] = new Array()) {
     this.problemId = problemId;
-    this.submissions = new Array();
-    if (submissions) this.addSubmissions(submissions);
-  }
-
-  addSubmissions(submissions: Submission[]) {
-    submissions.forEach(s => {
-      this.submissions.push(s);
-    });
+    this.submissions = submissions;
   }
 
   static toString(ps: ProblemStatus) {

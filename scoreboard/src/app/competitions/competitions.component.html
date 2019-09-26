@@ -1,0 +1,36 @@
+<div class='admin-panel'>
+    <mat-accordion>
+      <mat-expansion-panel *ngFor='let competition of competitions; let i = index' class='competition'>
+        <mat-expansion-panel-header [collapsedHeight]="'auto'">
+          <mat-panel-title>
+            <br>
+            {{competition.name}}
+            <br>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{competition.competidors.length}} competidors
+            <br>
+            {{competition.problems.length}} problems
+            <br>
+            {{competition.startTime | date:'d/M/yy hh:mm z'}} to {{competition.endTime | date:'d/M/yy hh:mm z'}}
+          </mat-panel-description>
+          <!-- <button mat-icon-button (click)='goTo(competition)' color='accent'><mat-icon>add</mat-icon></button> -->
+          <button mat-mini-fab (click)='goTo(competition)' color='accent'>View</button>
+        </mat-expansion-panel-header>
+
+        <mat-progress-bar mode="determinate" [value]="this.progressBars[i]"mat-progress-bar></mat-progress-bar>
+
+        <!-- Problems list -->
+        <h3>Problems</h3>
+        <mat-card *ngFor='let problem of competition.problems; let j = index' class="card-list">
+          <h3>ProblemId: {{problem.id}}</h3>
+        </mat-card>
+    
+        <!-- Competidors list -->
+        <h3>Competidors</h3>
+        <mat-card *ngFor='let competidor of competition.competidors; let j = index' class="card-list">
+          <h3>Name: {{competidor.name}}, Id: {{competidor.id}}</h3>
+        </mat-card>
+      </mat-expansion-panel>
+    </mat-accordion>
+</div>
