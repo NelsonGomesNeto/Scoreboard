@@ -14,9 +14,12 @@ import { Problem } from '../model/problem';
 export class AdminComponent implements OnInit {
 
   competitions: Competition[];
+
   newProblemId = '';
   newCompetidorId = '';
   newCompetidorName = '';
+
+  newCompetitionId = '';
   newCompetitionName = '';
   newCompetitionStartDate = '';
   newCompetitionStartTime = '';
@@ -43,7 +46,7 @@ export class AdminComponent implements OnInit {
     startTime.setHours(Number(this.newCompetitionStartTime.split(':')[0]), Number(this.newCompetitionStartTime.split(':')[1]));
     var endTime = new Date(this.newCompetitionEndDate);
     endTime.setHours(Number(this.newCompetitionEndTime.split(':')[0]), Number(this.newCompetitionEndTime.split(':')[1]));
-    this.server.addCompetition(new Competition(-1, this.newCompetitionName, startTime, endTime)).subscribe((newCompetition: Competition) => {
+    this.server.addCompetition(new Competition(Number(this.newCompetitionId), this.newCompetitionName, startTime, endTime)).subscribe((newCompetition: Competition) => {
       this.competitions.push(newCompetition);
     });
     this.newCompetitionName = this.newCompetitionStartDate = this.newCompetitionEndDate = this.newCompetitionStartTime = this.newCompetitionEndTime = '';
@@ -93,18 +96,27 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  invalidNewCompetition(withCompetitionName = true) {
-    if ((withCompetitionName && this.newCompetitionName == '') || this.newCompetitionStartDate == '' || this.newCompetitionEndDate == '' || this.newCompetitionStartTime == '' || this.newCompetitionEndTime == '') return true;
+  invalidDates() {
+    if (this.newCompetitionStartDate == '' || this.newCompetitionEndDate == '' || this.newCompetitionStartTime == '' || this.newCompetitionEndTime == '')
+      return true;
     var startTime = new Date(this.newCompetitionStartDate);
     startTime.setHours(Number(this.newCompetitionStartTime.split(':')[0]), Number(this.newCompetitionStartTime.split(':')[1]));
     var endTime = new Date(this.newCompetitionEndDate);
     endTime.setHours(Number(this.newCompetitionEndTime.split(':')[0]), Number(this.newCompetitionEndTime.split(':')[1]));
-    if (startTime.getTime() >= endTime.getTime()) return true;
+    if (startTime.getTime() >= endTime.getTime())
+      return true;
     return false;
   }
 
+  invalidNewCompetition() {
+    if (this.invalidNumber(this.newCompetitionId) || this.newCompetitionName == '')
+      return true;
+    return this.invalidDates();
+  }
+
   invalidNumber(num: any) {
-    if (num == '') return true;
+    if (num == '')
+      return true;
     return isNaN(num);
   }
 }

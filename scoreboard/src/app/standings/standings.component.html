@@ -1,5 +1,5 @@
 <mat-card>
-  <mat-card-title>{{standings.name}}</mat-card-title>
+  <mat-card-title>{{standings.name}} || {{standings.id}}</mat-card-title>
   <mat-card-subtitle>{{standings.startTime | date:'d/M/yy hh:mm z'}} to {{standings.endTime | date:'d/M/yy hh:mm z'}}</mat-card-subtitle>
   <mat-progress-bar mode="determinate" [value]="progressBarValue"></mat-progress-bar>
 </mat-card>

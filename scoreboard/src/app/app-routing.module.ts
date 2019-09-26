@@ -7,6 +7,7 @@ import { AuthenticationResolver } from './service/authentication/authentication-
 import { CompetitionsComponent } from './competitions/competitions.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: '/competitions', pathMatch: 'full' },
   { path: 'standings/:id', component: StandingsComponent },
   { path: 'competitions', component: CompetitionsComponent },
   { path: 'admin', component: AdminComponent, resolve: { token: AuthenticationResolver } },

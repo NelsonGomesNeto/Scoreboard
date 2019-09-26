@@ -29,7 +29,7 @@ export class StandingsComponent implements OnInit {
     this.server.getStandings(this.id).subscribe((data: any) => {
       this.standings = Competition.parse(data.standings);
       this.time = new Date(data.time);
-
+      
       this.displayedColumns.push('name');
       this.columns.push({columnDef: 'name', header: 'Name', cell: (c: Competidor) => c.name});
       for (var i = 0; i < this.standings.problems.length; i ++) {
@@ -39,8 +39,18 @@ export class StandingsComponent implements OnInit {
       }
       this.displayedColumns.push('total');
       this.columns.push({columnDef: 'total', header: 'Total', cell: (c: Competidor) => c.total});
-
+      
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
+    });
+    setInterval(() => this.updateStandings(), 30000);
+  }
+  
+  updateStandings() {
+    this.server.getStandings(this.id).subscribe((data: any) => {
+      this.standings = Competition.parse(data.standings);
+      this.time = new Date(data.time);
+      this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
+      console.log('refreshed standings');
     });
   }
 }

@@ -30,10 +30,46 @@ async function login(username, password) {
   });
 }
 
+async function updateCompetitionsSubmissions() {
+  if (huxleyToken == null) {
+    console.log('couldn\'t update because huxleyToken is null');
+    return;
+  }
+
+  let headers = {"Authorization": "Bearer " + huxleyToken, "Content-Type": "application/json"};
+  var competitions = db['competitions'], done = 0;
+  for (var i = 0; i < competitions.length; i ++) {
+    let url = huxley_url + '/v1/quizzes/' + competitions[i].id.toString() + '/scores';
+    request.get({url: url, headers: headers, competitionIndex: i}, (err, res, body) => {
+      if (err || body == undefined) {
+        console.log(err);
+        return;
+      }
+      let ci = res.request.competitionIndex;
+      users = JSON.parse(body);
+      for (var j = 0; j < users.length; j ++) {
+        var competidor = getById(competitions[ci].competidors, users[j].userId);
+        if (competidor == undefined) continue;
+        let problems = users[j].correctProblems;
+        for (var k = 0; k < problems.length; k ++) {
+          var problemStatus = getById(competidor.problemsStatus, problems[k].problemId);
+          if (problemStatus == undefined) continue;
+          problemStatus.submissions = problems[k].submissionCount;
+          problemStatus.accepted = problems[k].score == 1;
+          console.log(problemStatus);
+        }
+      }
+      if (++ done == competitions.length) {
+        console.log('updated competitions submissions successfully');
+        saveDatabase();
+      }
+    });
+  }
+}
+
 function loadDatabase() {
   db = fs.readFileSync(dbPath, 'utf8');
   db = JSON.parse(db);
-  // console.log(a);
 }
 
 function saveDatabase() {
@@ -62,6 +98,7 @@ function getNextId(array) {
 
 function initServer() {
   loadDatabase();
+  setInterval(() => updateCompetitionsSubmissions(), 30000);
 
   huxleyToken = clientToken = null;
 
@@ -84,7 +121,7 @@ function initServer() {
   server.post('/competitions', (req, res) => {
     var newCompetition = req.body;
     console.log(newCompetition);
-    newCompetition = new Competition(getNextId(db['competitions']), newCompetition.name, newCompetition.startTime, newCompetition.endTime);
+    newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime);
     db['competitions'].push(newCompetition);
     saveDatabase();
     res.json(newCompetition);
@@ -104,7 +141,7 @@ function initServer() {
     newCompetidor = new Competidor(newCompetidor.id, newCompetidor.name);
     for (var i = 0; i < competition.problems.length; i ++)
       newCompetidor.problemsStatus.push(new ProblemStatus(competition.problems[i].id));
-    getById(db['competitions'], req.params.id).competidors.push(newCompetidor);
+    competition.competidors.push(newCompetidor);
     saveDatabase();
     res.json(newCompetidor);
   });
@@ -112,7 +149,13 @@ function initServer() {
   server.put('/competition/:id/newProblem', (req, res) => {
     var newProblem = req.body;
     newProblem = new Problem(newProblem.id);
-    getById(db['competitions'], req.params.id).problems.push(newProblem);
+    var competition = getById(db['competitions'], req.params.id);
+    competition.problems.push(newProblem);
+    for (var i = 0; i < competition.competidors.length; i ++)
+      if (competition.competidors[i].problemsStatus.length != competition.problems.length)
+        for (var j = 0; j < competition.problems; j ++)
+          if (getById(competition.competidors[i].problemsStatus, competition.problems[j].id) == undefined)
+            competition.competidors[i].problemStatus.push(new ProblemStatus(competition.problems[j].id));
     saveDatabase();
     res.json(newProblem);
   });

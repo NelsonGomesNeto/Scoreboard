@@ -28,7 +28,6 @@ export class RequestService {
     return this.http.post(Utils.url + '/competitions', competition);
   }
 
-
   changeSchedule(id: number, schedule: any) {
     return this.http.patch(Utils.url + '/competition/' + id.toString() + '/changeSchedule', schedule);
   }
