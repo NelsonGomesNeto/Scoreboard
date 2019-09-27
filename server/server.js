@@ -30,41 +30,49 @@ async function login(username, password) {
   });
 }
 
+function getHuxleyDateString(date) {
+  str = new Date(date);
+  // str.setHours(str.getHours() + 3);
+  return str.toJSON().replace('.000Z', '-00:00');
+}
+
 async function updateCompetitionsSubmissions() {
   if (huxleyToken == null) {
     console.log('couldn\'t update because huxleyToken is null');
     return;
   }
 
+  // https://www.thehuxley.com/api/v1/submissions?submissionDateGe=2017-10-28T17:22:54-03:00&user=5875&submissionDateLe=2017-10-28T17:22:56-03:00&problem=794
+  // Ge == Greater, Le == Less
   let headers = {"Authorization": "Bearer " + huxleyToken, "Content-Type": "application/json"};
-  var competitions = db['competitions'], done = 0;
-  for (var i = 0; i < competitions.length; i ++) {
-    let url = huxley_url + '/v1/quizzes/' + competitions[i].id.toString() + '/scores';
-    request.get({url: url, headers: headers, competitionIndex: i}, (err, res, body) => {
-      if (err || body == undefined) {
-        console.log(err);
-        return;
-      }
-      let ci = res.request.competitionIndex;
-      users = JSON.parse(body);
-      for (var j = 0; j < users.length; j ++) {
-        var competidor = getById(competitions[ci].competidors, users[j].userId);
-        if (competidor == undefined) continue;
-        let problems = users[j].correctProblems;
-        for (var k = 0; k < problems.length; k ++) {
-          var problemStatus = getById(competidor.problemsStatus, problems[k].problemId);
-          if (problemStatus == undefined) continue;
-          problemStatus.submissions = problems[k].submissionCount;
-          problemStatus.accepted = problems[k].score == 1;
+  var competitions = db['competitions'], done = 0, totalRequired = 0;
+  competitions.forEach(competition => { totalRequired += competition.competidors.length * competition.problems.length; });
+  for (var i = 0; i < competitions.length; i ++)
+    for (var j = 0; j < competitions[i].competidors.length; j ++)
+      for (var k = 0; k < competitions[i].problems.length; k ++) {
+        let url = (huxley_url + '/v1/submissions?user=' + competitions[i].competidors[j].id.toString() + '&problem=' + competitions[i].problems[k].id.toString()
+                  + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime));
+        request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
+          if (err || body == undefined) {
+            console.log(err);
+            return;
+          }
+          let ci = res.request.competitionIndex, cj = res.request.competidorIndex, ck = res.request.problemIndex;
+          let submissions = JSON.parse(body);
+          var problemStatus = getById(competitions[ci].competidors[cj].problemsStatus, competitions[ci].problems[ck].id);
+          problemStatus.submissions = submissions.length;
+          if (submissions.length)
+            problemStatus.accepted = submissions[0].evaluation == 'CORRECT';
+          else
+            problemStatus.accepted = false;
           console.log(problemStatus);
-        }
+          // competidor.total = calculateCompetidorScore(competidor.problemsStatus);
+          if (++ done == totalRequired) {
+            console.log('updated competitions submissions successfully');
+            saveDatabase();
+          }
+        });
       }
-      if (++ done == competitions.length) {
-        console.log('updated competitions submissions successfully');
-        saveDatabase();
-      }
-    });
-  }
 }
 
 function loadDatabase() {
