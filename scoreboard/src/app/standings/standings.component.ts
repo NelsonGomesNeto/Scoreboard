@@ -28,6 +28,7 @@ export class StandingsComponent implements OnInit {
     this.id = this.activatedRoute.snapshot.params['id'];
     this.server.getStandings(this.id).subscribe((data: any) => {
       this.standings = Competition.parse(data.standings);
+      this.standings.competidors.sort(Competidor.compare);
       this.time = new Date(data.time);
       
       this.displayedColumns.push('name');
@@ -38,7 +39,7 @@ export class StandingsComponent implements OnInit {
         this.columns.push({columnDef: problemName, header: problemName, cell: (c: Competidor, i: number) => ProblemStatus.toString(c.problemsStatus[i - 1])});
       }
       this.displayedColumns.push('total');
-      this.columns.push({columnDef: 'total', header: 'Total', cell: (c: Competidor) => c.total});
+      this.columns.push({columnDef: 'total', header: 'Total', cell: (c: Competidor) => c.totalTime.toString() + ' (' + c.totalAccepted.toString() + ')'});
       
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
     });
@@ -48,6 +49,7 @@ export class StandingsComponent implements OnInit {
   updateStandings() {
     this.server.getStandings(this.id).subscribe((data: any) => {
       this.standings = Competition.parse(data.standings);
+      this.standings.competidors.sort(Competidor.compare);
       this.time = new Date(data.time);
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
       console.log('refreshed standings');

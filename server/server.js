@@ -36,6 +36,10 @@ function getHuxleyDateString(date) {
   return str.toJSON().replace('.000Z', '-00:00');
 }
 
+function calculateCompetidorScore(problemsStatus) {
+
+}
+
 async function updateCompetitionsSubmissions() {
   if (huxleyToken == null) {
     console.log('couldn\'t update because huxleyToken is null');
@@ -48,7 +52,8 @@ async function updateCompetitionsSubmissions() {
   var competitions = db['competitions'], done = 0, totalRequired = 0;
   competitions.forEach(competition => { totalRequired += competition.competidors.length * competition.problems.length; });
   for (var i = 0; i < competitions.length; i ++)
-    for (var j = 0; j < competitions[i].competidors.length; j ++)
+    for (var j = 0; j < competitions[i].competidors.length; j ++) {
+      competitions[i].competidors[j].totalTime = competitions[i].competidors[j].totalAccepted = 0;
       for (var k = 0; k < competitions[i].problems.length; k ++) {
         let url = (huxley_url + '/v1/submissions?user=' + competitions[i].competidors[j].id.toString() + '&problem=' + competitions[i].problems[k].id.toString()
                   + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime));
@@ -66,13 +71,17 @@ async function updateCompetitionsSubmissions() {
           else
             problemStatus.accepted = false;
           console.log(problemStatus);
-          // competidor.total = calculateCompetidorScore(competidor.problemsStatus);
+          if (submissions.length)
+            competitions[ci].competidors[cj].totalTime += Math.ceil(problemStatus.accepted * (new Date(submissions[0].submissionDate).getTime() - new Date(competitions[ci].startTime).getTime()) / (1000 * 60)
+                                                          + submissions.length * 15);
+          competitions[ci].competidors[cj].totalAccepted += problemStatus.accepted;
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
             saveDatabase();
           }
         });
       }
+    }
 }
 
 function loadDatabase() {
