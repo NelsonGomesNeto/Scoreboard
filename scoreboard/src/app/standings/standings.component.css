@@ -1,3 +1,51 @@
 table {
   width: 100%;
 }
+
+.standing {
+  position: absolute !important;
+  -webkit-transition: top 500ms ease;
+  -moz-transition: top 500ms ease;
+  -o-transition: top 500ms ease;
+  transition: top 500ms ease;
+}
+
+.stading-row {
+  position: relative;
+}
+
+.centralized-column {
+  display: flex;
+  justify-content: center;
+  border-left: 1px solid grey;
+  /* border-right: 1px solid grey;
+  border-radius: 10% 10%; */
+}
+
+.balloon-container {
+  display: flex;
+  justify-content: center;
+  z-index: 0;
+  position: relative;
+  height: 40px;
+  width: 40px;
+  top: -12px;
+}
+
+.submission-info {
+  z-index: 1;
+  position: absolute;
+  top: 10px;
+}
+
+.balloon {
+  height: 40px;
+  z-index: 2;
+  position: absolute;
+}
+
+.name-or-total {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}

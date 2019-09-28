@@ -6,9 +6,55 @@ import { Observable } from 'rxjs';
 import { ProblemStatus } from '../model/problem-status';
 import { ActivatedRoute } from '@angular/router';
 import { Competition } from '../model/competition';
+import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
 
 @Component({
   selector: 'app-standings',
+  animations: [
+    trigger('submitted', [
+      state('noBalloon', style({
+        backgroundColor: 'white'
+      })),
+      state('poppedBalloon0', style({
+        backgroundColor: 'red'
+      })),
+      state('poppedBalloon1', style({
+        backgroundColor: 'red'
+      })),
+      state('fullBalloon', style({
+        backgroundColor: 'green'
+      })),
+
+      transition('poppedBalloon1 <=> poppedBalloon0',
+        animate('3s', keyframes([
+          style({ backgroundColor: 'red', offset: 0 }),
+          style({ backgroundColor: 'yellow', offset: 0.9 }),
+          style({ backgroundColor: 'red', offset: 1 }),
+        ]))
+      ),
+      transition('noBalloon => poppedBalloon1',
+        animate('3s', keyframes([
+          style({ backgroundColor: 'white', offset: 0 }),
+          style({ backgroundColor: 'yellow', offset: 0.9 }),
+          style({ backgroundColor: 'red', offset: 1 }),
+        ]))
+      ),
+      transition('noBalloon => fullBalloon',
+        animate('3s', keyframes([
+          style({ backgroundColor: 'white', offset: 0 }), // offset = 0
+          style({ backgroundColor: 'yellow', offset: 0.9 }), // offset = 0.5
+          style({ backgroundColor: 'green', offset: 1 }), // offset = 1
+        ]))
+      ),
+      transition('poppedBalloon0 => fullBalloon, poppedBalloon1 => fullBalloon',
+        animate('3s', keyframes([
+          style({ backgroundColor: 'red', offset: 0 }), // offset = 0
+          style({ backgroundColor: 'yellow', offset: 0.9 }), // offset = 0.5
+          style({ backgroundColor: 'green', offset: 1 }), // offset = 1
+        ]))
+      )
+    ])
+  ],
   templateUrl: './standings.component.html',
   styleUrls: ['./standings.component.css']
 })
@@ -17,9 +63,14 @@ export class StandingsComponent implements OnInit {
   displayedColumns: string[] = [];
   columns: object[] = [];
   standings: Competition = new Competition(-1, '');
+  position: number[] = [];
+  updatedStandings: Competition = new Competition(-1, '');
   time: Date = new Date();
   id = 0;
   progressBarValue = 0;
+  tick = false;
+  originalMap: Map<number, number> = new Map();
+  updatedMap: Map<number, number> = new Map();
 
   constructor(private server: RequestService, private activatedRoute: ActivatedRoute) {
   }
@@ -29,6 +80,11 @@ export class StandingsComponent implements OnInit {
     this.server.getStandings(this.id).subscribe((data: any) => {
       this.standings = Competition.parse(data.standings);
       this.standings.competidors.sort(Competidor.compare);
+      this.updatedStandings = this.standings;
+      this.standings.competidors.forEach(competidor => {
+        this.originalMap[competidor.id] = this.updatedMap[competidor.id] = this.position.length;
+        this.position.push(this.position.length);
+      });
       this.time = new Date(data.time);
       
       this.displayedColumns.push('name');
@@ -43,16 +99,43 @@ export class StandingsComponent implements OnInit {
       
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
     });
-    setInterval(() => this.updateStandings(), 30000);
+    setInterval(() => this.updateStandings(), 5000);
   }
   
   updateStandings() {
     this.server.getStandings(this.id).subscribe((data: any) => {
-      this.standings = Competition.parse(data.standings);
-      this.standings.competidors.sort(Competidor.compare);
+      this.updatedStandings = Competition.parse(data.standings);
+      this.updatedStandings.competidors.sort(Competidor.compare);
+      // if (this.tick = !this.tick) this.updatedStandings.competidors.reverse();
+      for (var i = 0; i < this.standings.competidors.length; i ++)
+        this.updatedMap[this.updatedStandings.competidors[i].id] = i;
+        // this.position[this.originalMap[this.updatedStandings.competidors[i].id]] = i;
+      this.standings.startTime = this.updatedStandings.startTime;
+      this.standings.endTime = this.updatedStandings.endTime;
+
       this.time = new Date(data.time);
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
       console.log('refreshed standings');
+      setTimeout(() => this.submissionAnimationEnded(), 3000);
     });
+  }
+  
+  getState(i: number, j: number) {
+    j = j - 1;
+    i = this.updatedMap[this.standings.competidors[i].id];
+    if (this.updatedStandings.competidors[i].problemsStatus[j].submissions == 0)
+      return 'noBalloon';
+    return this.updatedStandings.competidors[i].problemsStatus[j].accepted ? 'fullBalloon' : ('poppedBalloon' + (this.updatedStandings.competidors[i].problemsStatus[j].submissions & 1).toString());
+  }
+
+  submissionAnimationEnded() {
+    for (var i = 0; i < this.standings.competidors.length; i ++) {
+      let ui = this.updatedMap[this.standings.competidors[i].id];
+      this.standings.competidors[i].problemsStatus = this.updatedStandings.competidors[ui].problemsStatus;
+      this.standings.competidors[i].totalTime = this.updatedStandings.competidors[ui].totalTime;
+      this.standings.competidors[i].totalAccepted = this.updatedStandings.competidors[ui].totalAccepted;
+      this.position[i] = ui;
+    }
+    console.log('updated standings');
   }
 }

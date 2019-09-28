@@ -30,8 +30,9 @@ async function login(username, password) {
   });
 }
 
-function getHuxleyDateString(date) {
+function getHuxleyDateString(date, minuteShift) {
   str = new Date(date);
+  str.setMinutes(str.getMinutes() - minuteShift);
   // str.setHours(str.getHours() + 3);
   return str.toJSON().replace('.000Z', '-00:00');
 }
@@ -56,7 +57,7 @@ async function updateCompetitionsSubmissions() {
       competitions[i].competidors[j].totalTime = competitions[i].competidors[j].totalAccepted = 0;
       for (var k = 0; k < competitions[i].problems.length; k ++) {
         let url = (huxley_url + '/v1/submissions?user=' + competitions[i].competidors[j].id.toString() + '&problem=' + competitions[i].problems[k].id.toString()
-                  + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime));
+                  + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime, -1) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime, 1));
         request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
           if (err || body == undefined) {
             console.log(err);
@@ -66,14 +67,15 @@ async function updateCompetitionsSubmissions() {
           let submissions = JSON.parse(body);
           var problemStatus = getById(competitions[ci].competidors[cj].problemsStatus, competitions[ci].problems[ck].id);
           problemStatus.submissions = submissions.length;
-          if (submissions.length)
+          if (submissions.length) {
             problemStatus.accepted = submissions[0].evaluation == 'CORRECT';
+            if (submissions[0].evaluation == 'WAITING') problemStatus.submissions --;
+          }
           else
             problemStatus.accepted = false;
-          console.log(problemStatus);
           if (submissions.length)
-            competitions[ci].competidors[cj].totalTime += Math.ceil(problemStatus.accepted * (new Date(submissions[0].submissionDate).getTime() - new Date(competitions[ci].startTime).getTime()) / (1000 * 60)
-                                                          + submissions.length * 15);
+            competitions[ci].competidors[cj].totalTime += problemStatus.accepted * Math.ceil((new Date(submissions[0].submissionDate).getTime() - new Date(competitions[ci].startTime).getTime()) / (1000 * 60)
+                                                                                             + problemStatus.accepted * (submissions.length - 1) * 15);
           competitions[ci].competidors[cj].totalAccepted += problemStatus.accepted;
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
@@ -115,7 +117,7 @@ function getNextId(array) {
 
 function initServer() {
   loadDatabase();
-  setInterval(() => updateCompetitionsSubmissions(), 30000);
+  setInterval(() => updateCompetitionsSubmissions(), 5000);
 
   huxleyToken = clientToken = null;
 
@@ -169,10 +171,7 @@ function initServer() {
     var competition = getById(db['competitions'], req.params.id);
     competition.problems.push(newProblem);
     for (var i = 0; i < competition.competidors.length; i ++)
-      if (competition.competidors[i].problemsStatus.length != competition.problems.length)
-        for (var j = 0; j < competition.problems; j ++)
-          if (getById(competition.competidors[i].problemsStatus, competition.problems[j].id) == undefined)
-            competition.competidors[i].problemStatus.push(new ProblemStatus(competition.problems[j].id));
+      competition.competidors[i].problemsStatus.push(new ProblemStatus(newProblem.id));
     saveDatabase();
     res.json(newProblem);
   });

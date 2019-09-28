@@ -7,7 +7,7 @@ import { StandingsComponent } from './standings/standings.component';
 import { AdminComponent } from './admin/admin.component';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSortModule, MatTableModule, MatCommonModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatFormFieldControl, MatInputModule, MatButtonModule, MatExpansionModule, MatCardModule, MatIconModule, MatChipsModule, MatDatepickerModule, MatNativeDateModule, MatProgressBarModule } from '@angular/material';
+import { MatSortModule, MatTableModule, MatCommonModule, MatFormFieldModule, MatSelectModule, MatOptionModule, MatFormFieldControl, MatInputModule, MatButtonModule, MatExpansionModule, MatCardModule, MatIconModule, MatChipsModule, MatDatepickerModule, MatNativeDateModule, MatProgressBarModule, MatDividerModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationResolver } from './service/authentication/authentication-resolver';
@@ -24,6 +24,7 @@ import { CompetitionsComponent } from './competitions/competitions.component';
    ],
    imports: [
       BrowserModule,
+      BrowserAnimationsModule,
       AppRoutingModule,
       HttpClientModule,
       BrowserAnimationsModule,
@@ -43,7 +44,8 @@ import { CompetitionsComponent } from './competitions/competitions.component';
       MatDatepickerModule,
       MatNativeDateModule,
       AmazingTimePickerModule,
-      MatProgressBarModule
+      MatProgressBarModule,
+      MatDividerModule
    ],
    providers: [
       AuthenticationResolver
