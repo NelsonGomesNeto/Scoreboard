@@ -119,6 +119,7 @@ function initServer() {
   huxleyToken = clientToken = null;
 
   const server = express();
+  server.use(express.static(__dirname + 'scoreboard/dist'));
   server.use(bodyParser.json());
   server.use(bodyParser.urlencoded({extended: false}));
   server.use(function(req, res, next){
