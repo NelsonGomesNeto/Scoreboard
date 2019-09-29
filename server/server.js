@@ -57,7 +57,8 @@ async function updateCompetitionsSubmissions() {
       competitions[i].competidors[j].totalTime = competitions[i].competidors[j].totalAccepted = 0;
       for (var k = 0; k < competitions[i].problems.length; k ++) {
         let url = (huxley_url + '/v1/submissions?user=' + competitions[i].competidors[j].id.toString() + '&problem=' + competitions[i].problems[k].id.toString()
-                  + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime, -1) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime, 1));
+                  + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime, -1) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime, 1)
+                  + '&max=100');
         request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
           if (err || body == undefined) {
             console.log(err);

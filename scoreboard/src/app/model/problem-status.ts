@@ -14,8 +14,6 @@ export class ProblemStatus {
   static toString(ps: ProblemStatus) {
     if (ps.submissions == 0)
       return '-';
-    // if (ps.submissions == 1)
-      // return '';
     return ps.submissions.toString();
     // if (ps.accepted == true)
     //   return '🎈 ' + (ps.submissions > 1 ? ps.submissions.toString() : '');
