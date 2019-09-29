@@ -18,6 +18,7 @@
 
 .card-list {
   display: flex;
+  margin: 5px 5px;
 }
 .card-list h3 {
   flex: 1;

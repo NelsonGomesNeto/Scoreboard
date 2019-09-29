@@ -18,8 +18,8 @@
         <button mat-icon-button (click)='removeCompetition(competition)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-expansion-panel-header>
 
-      <!-- Date -->
-      <h3>Date</h3>
+      <!-- Schedule -->
+      <h3>Schedule</h3>
       <mat-card>
         <mat-form-field>
           <input matInput placeholder="Start Date" [matDatepicker]="competitionStartDate" name="competitionStartDate" [(ngModel)]="newCompetitionStartDate" required>
@@ -36,9 +36,9 @@
           <mat-datepicker #competitionEndDate></mat-datepicker>
         </mat-form-field>
         <mat-form-field style="width: 20%; padding-left: 5px;">
-          <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="End Time" name="competitionEndTime" [(ngModel)]="newCompetitionEndTime" required>
-        </mat-form-field>
-        <button mat-raised-button (click)='changeSchedule(competition)' [disabled]='invalidDates()' color='accent'>Change Schedule</button>
+            <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="End Time" name="competitionEndTime" [(ngModel)]="newCompetitionEndTime" required>
+          </mat-form-field>
+          <button style="float: right" mat-raised-button (click)='changeSchedule(competition)' [disabled]='invalidDates()' color='accent'>Change Schedule</button>
       </mat-card>
 
       <!-- Problems list -->
@@ -51,7 +51,7 @@
         <mat-form-field>
           <input matInput placeholder="problemId" name="problemId" [(ngModel)]="newProblemId" required>
         </mat-form-field>
-        <button mat-raised-button (click)='addProblem(competition)' [disabled]='invalidNumber(newProblemId)' color='accent'>Add Problem</button>
+        <button style="float: right" mat-raised-button (click)='addProblem(competition)' [disabled]='invalidNumber(newProblemId)' color='accent'>Add Problem</button>
       </mat-card>
   
       <!-- Competidors list -->
@@ -68,12 +68,14 @@
         <mat-form-field>
           <input matInput placeholder="competidorName" name="competidorName" [(ngModel)]="newCompetidorName" required>
         </mat-form-field>
-        <button mat-raised-button (click)='addCompetidor(competition)' [disabled]='invalidNumber(newCompetidorId) || newCompetidorName == ""' color='accent'>Add Competidor</button>
+        <button style="float: right" mat-raised-button (click)='addCompetidor(competition)' [disabled]='invalidNumber(newCompetidorId) || newCompetidorName == ""' color='accent'>Add Competidor</button>
       </mat-card>
 
       <!-- <button mat-raised-button (click)='removeCompetition(competition)' color='accent'>Remove Competition</button> -->
     </mat-expansion-panel>
   </mat-accordion>
+
+  <br>
 
   <mat-card>
     <mat-form-field>
@@ -104,5 +106,6 @@
     <br>
     <button mat-raised-button (click)='addCompetition()' [disabled]='invalidNewCompetition()' color='accent'>Add Competition</button>
   </mat-card>
+  <br>
   <button mat-raised-button (click)='logout()' color='accent'>Logout</button>
 </div>

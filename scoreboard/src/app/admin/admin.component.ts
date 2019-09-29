@@ -46,8 +46,11 @@ export class AdminComponent implements OnInit {
     startTime.setHours(Number(this.newCompetitionStartTime.split(':')[0]), Number(this.newCompetitionStartTime.split(':')[1]));
     var endTime = new Date(this.newCompetitionEndDate);
     endTime.setHours(Number(this.newCompetitionEndTime.split(':')[0]), Number(this.newCompetitionEndTime.split(':')[1]));
-    this.server.addCompetition(new Competition(Number(this.newCompetitionId), this.newCompetitionName, startTime, endTime)).subscribe((newCompetition: Competition) => {
+    this.server.addCompetition(new Competition(Number(this.newCompetitionId), this.newCompetitionName, startTime, endTime)).subscribe(
+      (newCompetition: Competition) => {
       this.competitions.push(newCompetition);
+    }, err => {
+      console.log(err);
     });
     this.newCompetitionName = this.newCompetitionStartDate = this.newCompetitionEndDate = this.newCompetitionStartTime = this.newCompetitionEndTime = '';
   }

@@ -37,10 +37,6 @@ function getHuxleyDateString(date, minuteShift) {
   return str.toJSON().replace('.000Z', '-00:00');
 }
 
-function calculateCompetidorScore(problemsStatus) {
-
-}
-
 async function updateCompetitionsSubmissions() {
   if (huxleyToken == null) {
     console.log('couldn\'t update because huxleyToken is null');
@@ -127,8 +123,8 @@ function initServer() {
   server.use(bodyParser.urlencoded({extended: false}));
   server.use(function(req, res, next){
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE, PATCH");
+    res.setHeader("Access-Control-Allow-Headers", "content-type, token");
     res.setHeader("Content-Type", "application/json");
     res.setHeader("Access-Control-Allow-Credentials", true);
     next();
@@ -139,7 +135,12 @@ function initServer() {
   });
 
   server.post('/competitions', (req, res) => {
-    var newCompetition = req.body;
+    if (clientToken != req.body.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
+    var newCompetition = req.body.competition;
     console.log(newCompetition);
     newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime);
     db['competitions'].push(newCompetition);
@@ -148,15 +149,25 @@ function initServer() {
   });
 
   server.patch('/competition/:id/changeSchedule', (req, res) => {
+    if (clientToken != req.body.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
     var competition = getById(db['competitions'], req.params.id);
-    competition.startTime = new Date(req.body.startTime);
-    competition.endTime = new Date(req.body.endTime);
+    competition.startTime = new Date(req.body.schedule.startTime);
+    competition.endTime = new Date(req.body.schedule.endTime);
     saveDatabase();
     res.json(competition);
   });
   
   server.put('/competition/:id/newCompetidor', (req, res) => {
-    var newCompetidor = req.body;
+    if (clientToken != req.body.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
+    var newCompetidor = req.body.competidor;
     var competition = getById(db['competitions'], req.params.id);
     newCompetidor = new Competidor(newCompetidor.id, newCompetidor.name);
     for (var i = 0; i < competition.problems.length; i ++)
@@ -167,7 +178,12 @@ function initServer() {
   });
 
   server.put('/competition/:id/newProblem', (req, res) => {
-    var newProblem = req.body;
+    if (clientToken != req.body.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
+    var newProblem = req.body.problem;
     newProblem = new Problem(newProblem.id);
     var competition = getById(db['competitions'], req.params.id);
     competition.problems.push(newProblem);
@@ -178,12 +194,22 @@ function initServer() {
   });
 
   server.delete('/competition/:id', (req, res) => {
+    if (clientToken != req.headers.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
     deleteById(db['competitions'], req.params.id);
     saveDatabase();
     res.json(db['competitions']);
   });
 
   server.delete('/competition/:competitionId/competidor/:competidorId', (req, res) => {
+    if (clientToken != req.headers.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
     var competition = getById(db['competitions'], req.params.competitionId);
     if (competition)
       deleteById(competition.competidors, req.params.competidorId);
@@ -192,6 +218,11 @@ function initServer() {
   });
 
   server.delete('/competition/:competitionId/problem/:problemId', (req, res) => {
+    if (clientToken != req.headers.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
     var competition = getById(db['competitions'], req.params.competitionId);
     if (competition)
       deleteById(competition.problems, req.params.problemId);
