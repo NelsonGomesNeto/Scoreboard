@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "Simple scoreboard",
   "main": "server.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node server.js"
+  },
   "author": "Nelson Gomes Neto",
   "dependencies": {
     "body-parser": "^1.19.0",
