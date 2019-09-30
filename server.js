@@ -14,6 +14,7 @@ const path = require('path');
 const hostname = 'https://huxley-scoreboard.herokuapp.com';
 const dbPath = 'database/db.json';
 const huxley_url = 'https://thehuxley.com/api';
+const sha256password = '9d0f22969bde723554a7f33afe897d2faa370165406dc8531d94384c5c610ec6';
 const port = 443;
 var db;
 
@@ -148,14 +149,6 @@ function initServer() {
     next();
   });
 
-  // server.use(bodyParser.json({ limit: '50mb' }));
-  //   server.use(bodyParser.raw({ limit: '50mb' }));
-  //   server.use(bodyParser.text({ limit: '50mb' }));
-  //   server.use(bodyParser.urlencoded({
-  //     limit: '50mb',
-  //     extended: true
-  //   }));
-
   server.get('/api/competitions', (req, res) => {
     res.json({competitions: db['competitions'], time: Date.now()});
   });
@@ -261,6 +254,11 @@ function initServer() {
   });
 
   server.post('/api/login', (req, res) => {
+    if (sha256password != crypto.createHash('sha256').update(req.body.password).digest('hex')) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return
+    }
     login(req.body.username, req.body.password);
     clientToken = crypto.randomBytes(20).toString('hex')
     res.json(clientToken);
