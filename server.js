@@ -17,6 +17,12 @@ const pgdb = new Client({
   ssl: true,
 });
 pgdb.connect();
+pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)', (err, res) => {
+  if (err) {
+    console.log(err);
+  }
+  pgdb.end();
+});
 
 const hostname = 'https://huxley-scoreboard.herokuapp.com';
 const dbPath = 'database/db.json';
@@ -106,13 +112,6 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)', (err, res) => {
-    if (err) {
-      console.log(err);
-    }
-    pgdb.end();
-  });
-
   pgdb.query('SELECT * FROM db;', (err, res) => {
     if (err) throw err;
     if (res.rows.length == 0) {
