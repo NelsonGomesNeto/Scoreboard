@@ -11,11 +11,11 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const hostname = 'localhost';
+const hostname = 'huxley-scoreboard.herokuapp.com';
 const dbPath = 'database/db.json';
-var db;
 const huxley_url = 'https://thehuxley.com/api';
-const port = 3000;
+const port = 443;
+var db;
 
 const allowedExt = [
   '.js',
