@@ -21,6 +21,12 @@ table {
   /* border-right: 1px solid grey;
   border-radius: 10% 10%; */
 }
+.centralized-column:first-of-type {
+  padding-left: 0px;
+}
+.centralized-column:last-of-type {
+  padding-right: 0px;
+}
 
 .balloon-container {
   display: flex;
