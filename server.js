@@ -10,6 +10,13 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const Postgres = require('pg');
+
+const pgdb = new Postgres({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
+});
+pgdb.connect();
 
 const hostname = 'https://huxley-scoreboard.herokuapp.com';
 const dbPath = 'database/db.json';
@@ -99,12 +106,25 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  db = fs.readFileSync(dbPath, 'utf8');
-  db = JSON.parse(db);
+  pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTERGER PRIMARY KEY, data JSONB)');
+  pgdb.query('SELECT * FROM db;', (err, res) => {
+    if (err) throw err;
+    if (res.rows.length == 0) {
+      pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{}']);
+      db = {};
+    } else {
+      db = res.rows[0];
+    }
+    client.end();
+  });
+
+  // db = fs.readFileSync(dbPath, 'utf8');
+  // db = JSON.parse(db);
 }
 
 function saveDatabase() {
-  fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
+  pgdb.query('UPDATE db set data = ' + JSON.stringify(db) + ' WHERE key = 1');
+  // fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
 }
 
 function getById(array, id) {
