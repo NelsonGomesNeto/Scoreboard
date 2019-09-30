@@ -30,8 +30,12 @@ export class RequestService {
     return this.http.post(environment.api_url + '/competitions', {token: this.authenticationService.token, competition: competition});
   }
 
-  changeSchedule(id: number, schedule: any) {
-    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/changeSchedule', {token: this.authenticationService.token, schedule: schedule});
+  editInfo(id: number, info: any) {
+    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/editInfo', {token: this.authenticationService.token, info: info});
+  }
+
+  editSchedule(id: number, schedule: any) {
+    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/editSchedule', {token: this.authenticationService.token, schedule: schedule});
   }
 
   addProblem(id: number, problem: Problem) {

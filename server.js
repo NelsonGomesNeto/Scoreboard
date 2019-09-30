@@ -205,7 +205,20 @@ function initServer() {
     res.json(newCompetition);
   });
 
-  server.patch('/api/competition/:id/changeSchedule', (req, res) => {
+  server.patch('/api/competition/:id/editInfo', (req, res) => {
+    if (clientToken != req.body.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
+    var competition = getById(db['competitions'], req.params.id);
+    competition.name = new Date(req.body.info.name);
+    competition.id = new Date(req.body.info.id);
+    saveDatabase();
+    res.json(competition);
+  });
+
+  server.patch('/api/competition/:id/editSchedule', (req, res) => {
     if (clientToken != req.body.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
