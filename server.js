@@ -10,9 +10,9 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const Postgres = require('pg');
+const { Client } = require('pg');
 
-const pgdb = new Postgres({
+const pgdb = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: true,
 });
