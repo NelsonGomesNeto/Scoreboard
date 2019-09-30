@@ -278,7 +278,7 @@ function initServer() {
     }
   });
 
-  server.listen(port, hostname, () => {
+  server.listen(process.env.PORT || 5000, () => {
     console.log('Server running at http://${hostname}:${port}/');
   });
   // server.listen(port, () => {

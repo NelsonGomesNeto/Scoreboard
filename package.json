@@ -4,7 +4,8 @@
   "description": "Simple scoreboard",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "restart": "node server.js"
   },
   "author": "Nelson Gomes Neto",
   "dependencies": {
