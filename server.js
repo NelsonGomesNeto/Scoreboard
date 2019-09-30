@@ -140,7 +140,8 @@ function loadDatabase() {
 }
 
 function saveDatabase() {
-  pgdb.query('UPDATE db set data = ' + JSON.stringify(db) + ' WHERE key = 1', (err, res) => {
+  console.log('trying to insert:' + JSON.stringify(db));
+  pgdb.query('UPDATE db set data = $1 WHERE key = 1', [db], (err, res) => {
     if (err) {
       console.log(err);
       return;
