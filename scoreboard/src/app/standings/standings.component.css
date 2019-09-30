@@ -32,12 +32,21 @@ table {
   top: -12px;
 }
 
-.submission-info {
+.submission-time {
   z-index: 1;
   position: absolute;
-  top: 10px;
+  top: 11px;
   color: white;
   text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black;
+}
+.submission-count {
+  z-index: 3;
+  position: absolute;
+  top: 25px;
+  left: 40px;
+  color: white;
+  /* font-weight: bold; */
+  /* text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black; */
 }
 
 .balloon {

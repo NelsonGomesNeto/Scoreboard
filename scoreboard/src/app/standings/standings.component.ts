@@ -105,7 +105,12 @@ export class StandingsComponent implements OnInit {
       for (var i = 0; i < this.standings.competidors.length; i ++) {
         this.updatedMap[this.updatedStandings.competidors[i].id] = i;
         let oi = this.originalMap[this.updatedStandings.competidors[i].id];
-        this.standings.competidors[oi].problemsStatus = this.updatedStandings.competidors[i].problemsStatus;
+        for (var j = 0; j < this.standings.problems.length; j ++) {
+          if (this.standings.competidors[oi].problemsStatus[j].submissions < this.updatedStandings.competidors[i].problemsStatus[j].submissions)
+            this.standings.competidors[oi].problemsStatus[j].accepted = -1;
+          this.standings.competidors[oi].problemsStatus[j].lastTime = this.updatedStandings.competidors[i].problemsStatus[j].lastTime;
+          this.standings.competidors[oi].problemsStatus[j].submissions = this.updatedStandings.competidors[i].problemsStatus[j].submissions;
+        }
       }
       this.standings.startTime = this.updatedStandings.startTime;
       this.standings.endTime = this.updatedStandings.endTime;
@@ -136,6 +141,7 @@ export class StandingsComponent implements OnInit {
       let ui = this.updatedMap[this.standings.competidors[i].id];
       this.standings.competidors[i].totalTime = this.updatedStandings.competidors[ui].totalTime;
       this.standings.competidors[i].totalAccepted = this.updatedStandings.competidors[ui].totalAccepted;
+      this.standings.competidors[i].problemsStatus = this.updatedStandings.competidors[ui].problemsStatus;
       this.position[i] = ui;
     }
     console.log('updated standings');

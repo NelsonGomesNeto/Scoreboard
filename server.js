@@ -11,25 +11,29 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');
+const production = true;
 
-const pgdb = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
-pgdb.connect();
-pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)', (err, res) => {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log('Created table');
-  }
-});
+// PRODUCTION DB
+if (production) {
+  const pgdb = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  });
+  pgdb.connect();
+  pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)', (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log('Created table');
+    }
+  });
+}
 
-const hostname = 'https://huxley-scoreboard.herokuapp.com';
+const hostname = 'localhost';
 const dbPath = 'database/db.json';
 const huxley_url = 'https://thehuxley.com/api';
 const sha256password = '9d0f22969bde723554a7f33afe897d2faa370165406dc8531d94384c5c610ec6';
-const port = 443;
+const port = 3000;
 var db;
 
 const allowedExt = [
@@ -61,7 +65,7 @@ async function login(username, password) {
 
 function getHuxleyDateString(date, minuteShift) {
   str = new Date(date);
-  str.setMinutes(str.getMinutes() - minuteShift);
+  str.setMinutes(str.getMinutes() + minuteShift);
   // str.setHours(str.getHours() + 3);
   return str.toJSON().replace('.000Z', '-00:00');
 }
@@ -99,9 +103,11 @@ async function updateCompetitionsSubmissions() {
           }
           else
             problemStatus.accepted = false;
-          if (submissions.length)
-            competitions[ci].competidors[cj].totalTime += problemStatus.accepted * Math.ceil((new Date(submissions[0].submissionDate).getTime() - new Date(competitions[ci].startTime).getTime()) / (1000 * 60)
+          if (submissions.length) {
+            problemStatus.lastTime = Math.ceil((new Date(submissions[0].submissionDate).getTime() - new Date(competitions[ci].startTime).getTime()) / (1000 * 60));
+            competitions[ci].competidors[cj].totalTime += problemStatus.accepted * Math.ceil(problemStatus.lastTime
                                                                                              + problemStatus.accepted * (submissions.length - 1) * 15);
+          }
           competitions[ci].competidors[cj].totalAccepted += problemStatus.accepted;
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
@@ -113,37 +119,42 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  db = {"competitions": []};
-  pgdb.query('SELECT data FROM db', (err, res) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    if (res.rows.length == 0) {
-      pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{"competitions": []}'], (err, res) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-      });
-    } else {
-      db = res.rows[0].data;
-    }
-    console.log('Loaded data');
-  });
-
-  // db = fs.readFileSync(dbPath, 'utf8');
-  // db = JSON.parse(db);
+  if (production) {
+    db = {"competitions": []};
+    pgdb.query('SELECT data FROM db', (err, res) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      if (res.rows.length == 0) {
+        pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{"competitions": []}'], (err, res) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+        });
+      } else {
+        db = res.rows[0].data;
+      }
+      console.log('Loaded data');
+    });
+  } else {
+    db = fs.readFileSync(dbPath, 'utf8');
+    db = JSON.parse(db);
+  }
 }
 
 function saveDatabase() {
-  pgdb.query('UPDATE db set data = $1 WHERE key = 1', [db], (err, res) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
-  });
-  // fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
+  if (production) {
+    pgdb.query('UPDATE db set data = $1 WHERE key = 1', [db], (err, res) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+    });
+  } else {
+    fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
+  }
 }
 
 function getById(array, id) {
@@ -327,12 +338,15 @@ function initServer() {
     }
   });
 
-  server.listen(process.env.PORT || 5000, () => {
-    console.log('Server running at http://${hostname}:${port}/');
-  });
-  // server.listen(port, () => {
-  //   console.log(`Server running at http://${hostname}:${port}/`);
-  // });
+  if (production) {
+    server.listen(process.env.PORT || 5000, () => {
+      console.log('Server running at http://${hostname}:${port}/');
+    });
+  } else {
+    server.listen(port, hostname, () => {
+      console.log(`Server running at http://${hostname}:${port}/`);
+    });
+  }
 }
 
 initServer();
