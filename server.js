@@ -112,8 +112,10 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  pgdb.query('SELECT * FROM db;', (err, res) => {
-    if (err) throw err;
+  pgdb.query('SELECT data FROM db;', (err, res) => {
+    if (err) {
+      console.log(err);
+    }
     if (res.rows.length == 0) {
       pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{}'], (err, res) => {
         if (err) {
