@@ -212,8 +212,8 @@ function initServer() {
       return;
     }
     var competition = getById(db['competitions'], req.params.id);
-    competition.name = new Date(req.body.info.name);
-    competition.id = new Date(req.body.info.id);
+    competition.name = req.body.info.name;
+    competition.id = req.body.info.id;
     saveDatabase();
     res.json(competition);
   });
