@@ -4,16 +4,30 @@ const Problem = require('./model/problem.js')
 const Competition = require('./model/competition.js')
 
 const request = require('request');
+const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 
 const hostname = 'localhost';
 const dbPath = 'database/db.json';
 var db;
 const huxley_url = 'https://thehuxley.com/api';
 const port = 3000;
+
+const allowedExt = [
+  '.js',
+  '.ico',
+  '.css',
+  '.png',
+  '.jpg',
+  '.woff2',
+  '.woff',
+  '.ttf',
+  '.svg',
+];
 
 var huxleyToken = null;
 var clientToken = null;
@@ -119,23 +133,34 @@ function initServer() {
   huxleyToken = clientToken = null;
 
   const server = express();
-  server.use(express.static(__dirname + 'scoreboard/dist'));
+  server.use(cors());
+  server.use(express.static(path.join(__dirname, 'public')));
   server.use(bodyParser.json());
-  server.use(bodyParser.urlencoded({extended: false}));
+  server.use(bodyParser.text());
+  server.use(bodyParser.raw());
+  server.use(bodyParser.urlencoded({extended: true}));
   server.use(function(req, res, next){
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE, PATCH");
     res.setHeader("Access-Control-Allow-Headers", "content-type, token");
-    res.setHeader("Content-Type", "application/json");
+    // res.setHeader("Content-Type", "application/json");
     res.setHeader("Access-Control-Allow-Credentials", true);
     next();
   });
 
-  server.get('/competitions', (req, res) => {
+  // server.use(bodyParser.json({ limit: '50mb' }));
+  //   server.use(bodyParser.raw({ limit: '50mb' }));
+  //   server.use(bodyParser.text({ limit: '50mb' }));
+  //   server.use(bodyParser.urlencoded({
+  //     limit: '50mb',
+  //     extended: true
+  //   }));
+
+  server.get('/api/competitions', (req, res) => {
     res.json({competitions: db['competitions'], time: Date.now()});
   });
 
-  server.post('/competitions', (req, res) => {
+  server.post('/api/competitions', (req, res) => {
     if (clientToken != req.body.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -149,7 +174,7 @@ function initServer() {
     res.json(newCompetition);
   });
 
-  server.patch('/competition/:id/changeSchedule', (req, res) => {
+  server.patch('/api/competition/:id/changeSchedule', (req, res) => {
     if (clientToken != req.body.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -162,7 +187,7 @@ function initServer() {
     res.json(competition);
   });
   
-  server.put('/competition/:id/newCompetidor', (req, res) => {
+  server.put('/api/competition/:id/newCompetidor', (req, res) => {
     if (clientToken != req.body.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -178,7 +203,7 @@ function initServer() {
     res.json(newCompetidor);
   });
 
-  server.put('/competition/:id/newProblem', (req, res) => {
+  server.put('/api/competition/:id/newProblem', (req, res) => {
     if (clientToken != req.body.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -194,7 +219,7 @@ function initServer() {
     res.json(newProblem);
   });
 
-  server.delete('/competition/:id', (req, res) => {
+  server.delete('/api/competition/:id', (req, res) => {
     if (clientToken != req.headers.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -205,7 +230,7 @@ function initServer() {
     res.json(db['competitions']);
   });
 
-  server.delete('/competition/:competitionId/competidor/:competidorId', (req, res) => {
+  server.delete('/api/competition/:competitionId/competidor/:competidorId', (req, res) => {
     if (clientToken != req.headers.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -218,7 +243,7 @@ function initServer() {
     res.json(competition);
   });
 
-  server.delete('/competition/:competitionId/problem/:problemId', (req, res) => {
+  server.delete('/api/competition/:competitionId/problem/:problemId', (req, res) => {
     if (clientToken != req.headers.token || clientToken == null) {
       res.sendStatus(403);
       console.log('Not allowed');
@@ -231,22 +256,33 @@ function initServer() {
     res.json(competition);
   });
 
-  server.get('/standings/:id', (req, res) => {
+  server.get('/api/standings/:id', (req, res) => {
     res.json({standings: getById(db['competitions'], req.params.id), time: Date.now()});
   });
 
-  server.post('/login', (req, res) => {
+  server.post('/api/login', (req, res) => {
     login(req.body.username, req.body.password);
     clientToken = crypto.randomBytes(20).toString('hex')
     res.json(clientToken);
   });
 
-  server.post('/valid', (req, res) => {
+  server.post('/api/valid', (req, res) => {
     res.json(clientToken == req.body.token);
   });
-  
-  server.listen(port, hostname, () => {
-    console.log('Server running at http://${hostname}:${port}/');
+
+  server.get('*', (req, res) => {
+    if (allowedExt.filter(ext => req.url.indexOf(ext) > 0).length > 0) {
+      res.sendFile(path.resolve('public' + req.url));
+    } else {
+      res.sendFile(path.resolve('public/index.html'));
+    }
+  });
+
+  // server.listen(port, hostname, () => {
+  //   console.log('Server running at http://${hostname}:${port}/');
+  // });
+  server.listen(port, () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
   });
 }
 
