@@ -11,7 +11,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const hostname = 'huxley-scoreboard.herokuapp.com';
+const hostname = 'https://huxley-scoreboard.herokuapp.com';
 const dbPath = 'database/db.json';
 const huxley_url = 'https://thehuxley.com/api';
 const port = 443;
