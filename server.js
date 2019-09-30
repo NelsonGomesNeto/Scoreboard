@@ -106,16 +106,27 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTERGER PRIMARY KEY, data JSONB)');
+  pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTERGER PRIMARY KEY, data JSONB)', (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    pgdb.end();
+  });
+
   pgdb.query('SELECT * FROM db;', (err, res) => {
     if (err) throw err;
     if (res.rows.length == 0) {
-      pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{}']);
+      pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{}'], (err, res) => {
+        if (err) {
+          console.log(err);
+        }
+        pgdb.end();
+      });
       db = {};
     } else {
       db = res.rows[0];
     }
-    client.end();
+    pgdb.end();
   });
 
   // db = fs.readFileSync(dbPath, 'utf8');
@@ -123,7 +134,12 @@ function loadDatabase() {
 }
 
 function saveDatabase() {
-  pgdb.query('UPDATE db set data = ' + JSON.stringify(db) + ' WHERE key = 1');
+  pgdb.query('UPDATE db set data = ' + JSON.stringify(db) + ' WHERE key = 1', (err, res) => {
+    if (err) {
+      console.log(err);
+    }
+    pgdb.end();
+  });
   // fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
 }
 
