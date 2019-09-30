@@ -130,7 +130,8 @@ function loadDatabase() {
         }
       });
     } else {
-      db = res.rows[0];
+      // rows: [ { data: {} } ],
+      db = res.rows[0].data;
     }
   });
 
