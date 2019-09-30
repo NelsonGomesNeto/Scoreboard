@@ -21,7 +21,7 @@ pgdb.query('CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)',
   if (err) {
     console.log(err);
   } else {
-    console.log('created table');
+    console.log('Created table');
   }
 });
 
@@ -115,13 +115,10 @@ async function updateCompetitionsSubmissions() {
 function loadDatabase() {
   db = {"competitions": []};
   pgdb.query('SELECT data FROM db', (err, res) => {
-    console.log(err);
-    console.log(res);
     if (err) {
       console.log(err);
       return;
     }
-    console.log('Trying to insert');
     if (res.rows.length == 0) {
       pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{"competitions": []}'], (err, res) => {
         if (err) {
@@ -130,9 +127,9 @@ function loadDatabase() {
         }
       });
     } else {
-      // rows: [ { data: {} } ],
       db = res.rows[0].data;
     }
+    console.log('Loaded data');
   });
 
   // db = fs.readFileSync(dbPath, 'utf8');
@@ -140,7 +137,6 @@ function loadDatabase() {
 }
 
 function saveDatabase() {
-  console.log('trying to insert:' + JSON.stringify(db));
   pgdb.query('UPDATE db set data = $1 WHERE key = 1', [db], (err, res) => {
     if (err) {
       console.log(err);
@@ -203,7 +199,6 @@ function initServer() {
       return;
     }
     var newCompetition = req.body.competition;
-    console.log(newCompetition);
     newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime);
     db['competitions'].push(newCompetition);
     saveDatabase();
