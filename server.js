@@ -112,6 +112,7 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
+  pgdb.connect();
   pgdb.query('SELECT data FROM db', (err, res) => {
     console.log(err);
     console.log(res);
@@ -139,6 +140,7 @@ function loadDatabase() {
 }
 
 function saveDatabase() {
+  pgdb.connect();
   pgdb.query('UPDATE db set data = ' + JSON.stringify(db) + ' WHERE key = 1', (err, res) => {
     if (err) {
       console.log(err);
