@@ -14,7 +14,7 @@ const { Client } = require('pg');
 const production = true;
 
 // PRODUCTION DB
-if (production) {
+// if (production) {
   const pgdb = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true,
@@ -27,7 +27,7 @@ if (production) {
       console.log('Created table');
     }
   });
-}
+// }
 
 const hostname = 'localhost';
 const dbPath = 'database/db.json';
@@ -119,7 +119,7 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  if (production) {
+  // if (production) {
     db = {"competitions": []};
     pgdb.query('SELECT data FROM db', (err, res) => {
       if (err) {
@@ -138,23 +138,23 @@ function loadDatabase() {
       }
       console.log('Loaded data');
     });
-  } else {
-    db = fs.readFileSync(dbPath, 'utf8');
-    db = JSON.parse(db);
-  }
+  // } else {
+  //   db = fs.readFileSync(dbPath, 'utf8');
+  //   db = JSON.parse(db);
+  // }
 }
 
 function saveDatabase() {
-  if (production) {
+  // if (production) {
     pgdb.query('UPDATE db set data = $1 WHERE key = 1', [db], (err, res) => {
       if (err) {
         console.log(err);
         return;
       }
     });
-  } else {
-    fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
-  }
+  // } else {
+  //   fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
+  // }
 }
 
 function getById(array, id) {
@@ -338,15 +338,15 @@ function initServer() {
     }
   });
 
-  if (production) {
+  // if (production) {
     server.listen(process.env.PORT || 5000, () => {
       console.log('Server running at http://${hostname}:${port}/');
     });
-  } else {
-    server.listen(port, hostname, () => {
-      console.log(`Server running at http://${hostname}:${port}/`);
-    });
-  }
+  // } else {
+  //   server.listen(port, hostname, () => {
+  //     console.log(`Server running at http://${hostname}:${port}/`);
+  //   });
+  // }
 }
 
 initServer();
