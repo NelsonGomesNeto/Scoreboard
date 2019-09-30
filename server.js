@@ -113,6 +113,7 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
+  db = {};
   pgdb.query('SELECT data FROM db', (err, res) => {
     console.log(err);
     console.log(res);
@@ -120,19 +121,17 @@ function loadDatabase() {
       console.log(err);
       return;
     }
+    console.log('Trying to insert');
     if (res.rows.length == 0) {
       pgdb.query('INSERT INTO db(key, data) values($1, $2)', [1, '{}'], (err, res) => {
         if (err) {
           console.log(err);
           return;
         }
-        pgdb.end();
       });
-      db = {};
     } else {
       db = res.rows[0];
     }
-    pgdb.end();
   });
 
   // db = fs.readFileSync(dbPath, 'utf8');
@@ -145,7 +144,6 @@ function saveDatabase() {
       console.log(err);
       return;
     }
-    pgdb.end();
   });
   // fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
 }
