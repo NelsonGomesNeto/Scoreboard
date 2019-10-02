@@ -119,6 +119,7 @@ async function updateCompetitionsSubmissions() {
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
             db['competitions'] = JSON.parse(JSON.stringify(aux));
+            console.log(db['competitions']['4435'])
             saveDatabase();
           }
         });
