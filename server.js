@@ -118,7 +118,7 @@ async function updateCompetitionsSubmissions() {
           aux[ci].competidors[cj].totalAccepted += problemStatus.accepted;
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
-            db['competitions'] = aux;
+            db['competitions'] = JSON.parse(JSON.stringify(aux));
             saveDatabase();
           }
         });
