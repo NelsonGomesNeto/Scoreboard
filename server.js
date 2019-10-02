@@ -72,7 +72,7 @@ function getHuxleyDateString(date, minuteShift) {
 
 async function updateCompetitionsSubmissions() {
   if (huxleyToken == null || locked) {
-    if (locked) console.log('could\'t update because it\'s locked');
+    if (locked) console.log('couldn\'t update because it\'s locked');
     else console.log('couldn\'t update because huxleyToken is null');
     return;
   }
@@ -191,7 +191,7 @@ function getNextId(array) {
 
 function initServer() {
   loadDatabase();
-  setInterval(() => updateCompetitionsSubmissions(), 5000);
+  setInterval(() => updateCompetitionsSubmissions(), 30000);
 
   huxleyToken = clientToken = null;
 
