@@ -34,7 +34,7 @@ const dbPath = 'database/db.json';
 const huxley_url = 'https://thehuxley.com/api';
 const sha256password = '9d0f22969bde723554a7f33afe897d2faa370165406dc8531d94384c5c610ec6';
 const port = 3000;
-var db, auxDb;
+var db, locked = false;
 
 const allowedExt = [
   '.js',
@@ -71,15 +71,17 @@ function getHuxleyDateString(date, minuteShift) {
 }
 
 async function updateCompetitionsSubmissions() {
-  if (huxleyToken == null) {
-    console.log('couldn\'t update because huxleyToken is null');
+  if (huxleyToken == null || locked) {
+    if (locked) console.log('could\'t update because it\'s locked');
+    else console.log('couldn\'t update because huxleyToken is null');
     return;
   }
+  locked = true;
 
   // https://www.thehuxley.com/api/v1/submissions?submissionDateGe=2017-10-28T17:22:54-03:00&user=5875&submissionDateLe=2017-10-28T17:22:56-03:00&problem=794
   // Ge == Greater, Le == Less
   let headers = {"Authorization": "Bearer " + huxleyToken, "Content-Type": "application/json"};
-  aux = JSON.parse(JSON.stringify(db['competitions']));
+  var aux = JSON.parse(JSON.stringify(db['competitions']));
   var done = 0, totalRequired = 0;
   aux.forEach(competition => { totalRequired += competition.competidors.length * competition.problems.length; });
   for (var i = 0; i < aux.length; i ++)
@@ -100,6 +102,7 @@ async function updateCompetitionsSubmissions() {
             submissions = JSON.parse(body);
           } catch (e) {
             console.log(e);
+            locked = false;
             return;
           }
           var problemStatus = getById(aux[ci].competidors[cj].problemsStatus, aux[ci].problems[ck].id);
@@ -119,8 +122,8 @@ async function updateCompetitionsSubmissions() {
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
             db['competitions'] = JSON.parse(JSON.stringify(aux));
-            console.log(db['competitions']['4435'])
             saveDatabase();
+            locked = false;
           }
         });
       }
