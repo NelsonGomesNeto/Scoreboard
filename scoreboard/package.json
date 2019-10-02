@@ -24,6 +24,8 @@
     "amazing-time-picker": "^1.8.0",
     "class-transformer": "^0.2.3",
     "hammerjs": "^2.0.8",
+    "mat-color-picker": "^1.4.3",
+    "material-community-components": "^5.0.1",
     "pg": "^7.12.1",
     "rxjs": "~6.4.0",
     "tslib": "^1.10.0",

@@ -45,6 +45,10 @@ export class RequestService {
   removeProblem(id: number, problem: Problem) {
     return this.http.delete(environment.api_url + '/competition/' + id.toString() + '/problem/' + problem.id.toString(), {headers: {'token': this.authenticationService.token}});
   }
+
+  editProblemColor(id: number, problem: Problem) {
+    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/problem/' + problem.id.toString(), {token: this.authenticationService.token, color: problem.color});
+  }
   
   addCompetidor(id: number, competidor: Competidor) {
     return this.http.put(environment.api_url + '/competition/' + id.toString() + '/newCompetidor', {token: this.authenticationService.token, competidor: competidor});

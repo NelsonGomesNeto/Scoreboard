@@ -9,7 +9,7 @@
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
 
     <ng-container *ngFor="let column of columns; let colIndex = index" [matColumnDef]="column.columnDef">
-      <mat-header-cell *matHeaderCellDef class="centralized-column">
+      <mat-header-cell *matHeaderCellDef class="centralized-column" style="font-weight: bolder; font-size: 20px">
         {{ column.header }}
       </mat-header-cell>
       <mat-cell *matCellDef="let row; let rowIndex = index" class="centralized-column">
@@ -17,7 +17,8 @@
           <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [@submitted]="getState(rowIndex, colIndex)">
           <!-- <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [ngStyle]="{backgroundColor: getColor(colIndex)}" [@submitted]="getState(rowIndex, colIndex)"> -->
             <div class="submission-time" [ngStyle]="{fontSize: 15 - column.cell(row, colIndex)[0].length + 'px'}">{{ column.cell(row, colIndex)[0] }}</div>
-            <img class="balloon" src='../../assets/balloon.png'>
+            <img *ngIf="column.cell(row, colIndex)[0] != '-'; else noBalloon" class="balloon" src='../../assets/balloon.png'>
+            <ng-template #noBalloon><div class="no-balloon"></div></ng-template>
             <div class="submission-count" [ngStyle]="{color: column.cell(row, colIndex)[2]}">{{ column.cell(row, colIndex)[1] }}</div>
           </div>
           <ng-template #elseBlock>

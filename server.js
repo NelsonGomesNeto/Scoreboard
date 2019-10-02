@@ -11,10 +11,10 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');
-const production = true;
+const production = false;
 
 // PRODUCTION DB
-// if (production) {
+if (production) {
   const pgdb = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true,
@@ -27,14 +27,14 @@ const production = true;
       console.log('Created table');
     }
   });
-// }
+}
 
 const hostname = 'localhost';
 const dbPath = 'database/db.json';
 const huxley_url = 'https://thehuxley.com/api';
 const sha256password = '9d0f22969bde723554a7f33afe897d2faa370165406dc8531d94384c5c610ec6';
 const port = 3000;
-var db;
+var db, auxDb;
 
 const allowedExt = [
   '.js',
@@ -79,14 +79,15 @@ async function updateCompetitionsSubmissions() {
   // https://www.thehuxley.com/api/v1/submissions?submissionDateGe=2017-10-28T17:22:54-03:00&user=5875&submissionDateLe=2017-10-28T17:22:56-03:00&problem=794
   // Ge == Greater, Le == Less
   let headers = {"Authorization": "Bearer " + huxleyToken, "Content-Type": "application/json"};
-  var competitions = db['competitions'], done = 0, totalRequired = 0;
-  competitions.forEach(competition => { totalRequired += competition.competidors.length * competition.problems.length; });
-  for (var i = 0; i < competitions.length; i ++)
-    for (var j = 0; j < competitions[i].competidors.length; j ++) {
-      competitions[i].competidors[j].totalTime = competitions[i].competidors[j].totalAccepted = 0;
-      for (var k = 0; k < competitions[i].problems.length; k ++) {
-        let url = (huxley_url + '/v1/submissions?user=' + competitions[i].competidors[j].id.toString() + '&problem=' + competitions[i].problems[k].id.toString()
-                  + '&submissionDateGe=' + getHuxleyDateString(competitions[i].startTime, -1) + '&submissionDateLe=' + getHuxleyDateString(competitions[i].endTime, 1)
+  aux = JSON.parse(JSON.stringify(db['competitions']));
+  var done = 0, totalRequired = 0;
+  aux.forEach(competition => { totalRequired += competition.competidors.length * competition.problems.length; });
+  for (var i = 0; i < aux.length; i ++)
+    for (var j = 0; j < aux[i].competidors.length; j ++) {
+      aux[i].competidors[j].totalTime = aux[i].competidors[j].totalAccepted = 0;
+      for (var k = 0; k < aux[i].problems.length; k ++) {
+        let url = (huxley_url + '/v1/submissions?user=' + aux[i].competidors[j].id.toString() + '&problem=' + aux[i].problems[k].id.toString()
+                  + '&submissionDateGe=' + getHuxleyDateString(aux[i].startTime, -1) + '&submissionDateLe=' + getHuxleyDateString(aux[i].endTime, 1)
                   + '&max=100');
         request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
           if (err || body == undefined) {
@@ -94,8 +95,14 @@ async function updateCompetitionsSubmissions() {
             return;
           }
           let ci = res.request.competitionIndex, cj = res.request.competidorIndex, ck = res.request.problemIndex;
-          let submissions = JSON.parse(body);
-          var problemStatus = getById(competitions[ci].competidors[cj].problemsStatus, competitions[ci].problems[ck].id);
+          var submissions;
+          try {
+            submissions = JSON.parse(body);
+          } catch (e) {
+            console.log(e);
+            return;
+          }
+          var problemStatus = getById(aux[ci].competidors[cj].problemsStatus, aux[ci].problems[ck].id);
           problemStatus.submissions = submissions.length;
           if (submissions.length) {
             problemStatus.accepted = submissions[0].evaluation == 'CORRECT';
@@ -104,13 +111,14 @@ async function updateCompetitionsSubmissions() {
           else
             problemStatus.accepted = false;
           if (submissions.length) {
-            problemStatus.lastTime = Math.ceil((new Date(submissions[0].submissionDate).getTime() - new Date(competitions[ci].startTime).getTime()) / (1000 * 60));
-            competitions[ci].competidors[cj].totalTime += problemStatus.accepted * Math.ceil(problemStatus.lastTime
+            problemStatus.lastTime = Math.ceil((new Date(submissions[0].submissionDate).getTime() - new Date(aux[ci].startTime).getTime()) / (1000 * 60));
+            aux[ci].competidors[cj].totalTime += problemStatus.accepted * Math.ceil(problemStatus.lastTime
                                                                                              + problemStatus.accepted * (submissions.length - 1) * 15);
           }
-          competitions[ci].competidors[cj].totalAccepted += problemStatus.accepted;
+          aux[ci].competidors[cj].totalAccepted += problemStatus.accepted;
           if (++ done == totalRequired) {
             console.log('updated competitions submissions successfully');
+            db['competitions'] = aux;
             saveDatabase();
           }
         });
@@ -119,7 +127,7 @@ async function updateCompetitionsSubmissions() {
 }
 
 function loadDatabase() {
-  // if (production) {
+  if (production) {
     db = {"competitions": []};
     pgdb.query('SELECT data FROM db', (err, res) => {
       if (err) {
@@ -138,23 +146,23 @@ function loadDatabase() {
       }
       console.log('Loaded data');
     });
-  // } else {
-  //   db = fs.readFileSync(dbPath, 'utf8');
-  //   db = JSON.parse(db);
-  // }
+  } else {
+    db = fs.readFileSync(dbPath, 'utf8');
+    db = JSON.parse(db);
+  }
 }
 
 function saveDatabase() {
-  // if (production) {
+  if (production) {
     pgdb.query('UPDATE db set data = $1 WHERE key = 1', [db], (err, res) => {
       if (err) {
         console.log(err);
         return;
       }
     });
-  // } else {
-  //   fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
-  // }
+  } else {
+    fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
+  }
 }
 
 function getById(array, id) {
@@ -311,6 +319,21 @@ function initServer() {
     res.json(competition);
   });
 
+  server.patch('/api/competition/:competitionId/problem/:problemId', (req, res) => {
+    if (clientToken != req.body.token || clientToken == null) {
+      res.sendStatus(403);
+      console.log('Not allowed');
+      return;
+    }
+    var competition = getById(db['competitions'], req.params.competitionId);
+    if (competition) {
+      var problem = getById(competition.problems, req.params.problemId);
+      problem.color = req.body.color;
+    }
+    saveDatabase();
+    res.json(competition);
+  });
+
   server.get('/api/standings/:id', (req, res) => {
     res.json({standings: getById(db['competitions'], req.params.id), time: Date.now()});
   });
@@ -338,15 +361,15 @@ function initServer() {
     }
   });
 
-  // if (production) {
+  if (production) {
     server.listen(process.env.PORT || 5000, () => {
       console.log('Server running at http://${hostname}:${port}/');
     });
-  // } else {
-  //   server.listen(port, hostname, () => {
-  //     console.log(`Server running at http://${hostname}:${port}/`);
-  //   });
-  // }
+  } else {
+    server.listen(port, hostname, () => {
+      console.log(`Server running at http://${hostname}:${port}/`);
+    });
+  }
 }
 
 initServer();

@@ -26,6 +26,8 @@ export class AdminComponent implements OnInit {
   newCompetitionEndDate = '';
   newCompetitionEndTime = '';
 
+  jkl = '';
+
   constructor(private server: RequestService, private authenticationService: AuthenticationService, private route: Router) { }
 
   ngOnInit() {
@@ -89,6 +91,13 @@ export class AdminComponent implements OnInit {
   removeProblem(competition: Competition, j: number) {
     this.server.removeProblem(competition.id, competition.problems[j]).subscribe((updatedCompetition: Competition) => {
       competition.problems.splice(j, 1);
+    });
+  }
+
+  editProblemColor(competition: Competition, j: number, selectedColor: any) {
+    competition.problems[j].color = selectedColor;
+    this.server.editProblemColor(competition.id, competition.problems[j]).subscribe((updatedCompetition: Competition) => {
+      //
     });
   }
 

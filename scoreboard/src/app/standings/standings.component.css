@@ -14,10 +14,16 @@ table {
   position: relative;
 }
 
+.header-row {
+  font-weight: 1000 !important;
+}
+
 .centralized-column {
   display: flex;
   justify-content: center;
-  border-left: 1px solid grey;
+  border-left: 1px solid darkgrey;
+  border-bottom: 1px solid darkgrey;
+  background-color:#eee;
   /* border-right: 1px solid grey;
   border-radius: 10% 10%; */
 }
@@ -59,6 +65,11 @@ table {
   height: 41px;
   z-index: 2;
   position: absolute;
+}
+.no-balloon {
+  background-color: #eee;
+  width: 40px;
+  height: 40px
 }
 
 .name-or-total {

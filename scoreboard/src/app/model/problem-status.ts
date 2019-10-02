@@ -21,7 +21,7 @@ export class ProblemStatus {
     if (ps.accepted == 0)
       return ['-', ps.submissions.toString(), 'red'];
     if (ps.accepted == 1)
-      return [ps.lastTime.toString(), ps.submissions.toString(), '#10FF10'];
+      return [ps.lastTime.toString(), ps.submissions.toString(), '#36f53f'];
     // return ps.submissions.toString();
     // if (ps.accepted == true)
     //   return '🎈 ' + (ps.submissions > 1 ? ps.submissions.toString() : '');

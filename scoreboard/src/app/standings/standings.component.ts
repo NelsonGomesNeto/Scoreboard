@@ -123,6 +123,8 @@ export class StandingsComponent implements OnInit {
   }
 
   getColor(j: number) {
+    if (this.standings.problems[j].color)
+      return this.standings.problems[j].color;
     let value = Math.round(360 * (j / this.standings.problems.length));
     return 'hsl(' + value.toString() + ', 100%, 45%)';
   }

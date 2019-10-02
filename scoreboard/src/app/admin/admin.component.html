@@ -58,6 +58,7 @@
       <h3>Problems</h3>
       <mat-card *ngFor='let problem of competition.problems; let j = index' class="card-list">
         <h3>ProblemId: {{problem.id}}</h3>
+        <mcc-color-picker style="position: relative; right: 10px" [selectedColor]="problem.color" (selected)='editProblemColor(competition, j, $event)'></mcc-color-picker>
         <button mat-mini-fab (click)='removeProblem(competition, j)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-card>
       <mat-card>
