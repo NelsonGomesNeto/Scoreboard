@@ -13,7 +13,7 @@
         {{ column.header }}
       </mat-header-cell>
       <mat-cell *matCellDef="let row; let rowIndex = index" class="centralized-column">
-        <div class="standing" [ngStyle]="{top: 175 + position[rowIndex] * 48 + 'px'}">
+        <div class="standing" [ngStyle]="{top: 175 + position[rowIndex] * 49 + 'px'}">
           <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [@submitted]="getState(rowIndex, colIndex)">
           <!-- <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [ngStyle]="{backgroundColor: getColor(colIndex)}" [@submitted]="getState(rowIndex, colIndex)"> -->
             <div class="submission-time" [ngStyle]="{fontSize: 15 - column.cell(row, colIndex)[0].length + 'px'}">{{ column.cell(row, colIndex)[0] }}</div>
