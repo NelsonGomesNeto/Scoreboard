@@ -18,6 +18,19 @@
         <button mat-icon-button (click)='removeCompetition(competition)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-expansion-panel-header>
 
+      <!-- Info -->
+      <h3>Info</h3>
+      <mat-card>
+        <mat-form-field>
+          <input matInput placeholder="Competition Name" name="competitionName" [(ngModel)]="newCompetitionName" required>
+        </mat-form-field>
+        ||
+        <mat-form-field>
+          <input matInput placeholder="Huxley Quiz id" name="competitionId" [(ngModel)]="newCompetitionId" required>
+        </mat-form-field>
+        <button style="float: right" mat-raised-button (click)='editInfo(competition)' [disabled]="newCompetitionName == '' || invalidNumber(newCompetitionId)" color='accent'>Edit Info</button>
+      </mat-card>
+
       <!-- Schedule -->
       <h3>Schedule</h3>
       <mat-card>
@@ -36,15 +49,16 @@
           <mat-datepicker #competitionEndDate></mat-datepicker>
         </mat-form-field>
         <mat-form-field style="width: 20%; padding-left: 5px;">
-            <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="End Time" name="competitionEndTime" [(ngModel)]="newCompetitionEndTime" required>
-          </mat-form-field>
-          <button style="float: right" mat-raised-button (click)='changeSchedule(competition)' [disabled]='invalidDates()' color='accent'>Change Schedule</button>
+          <input atp-time-picker locale="pt-BR" value="23:59" matInput required placeholder="End Time" name="competitionEndTime" [(ngModel)]="newCompetitionEndTime" required>
+        </mat-form-field>
+        <button style="float: right" mat-raised-button (click)='editSchedule(competition)' [disabled]='invalidDates()' color='accent'>Edit Schedule</button>
       </mat-card>
 
       <!-- Problems list -->
       <h3>Problems</h3>
       <mat-card *ngFor='let problem of competition.problems; let j = index' class="card-list">
         <h3>ProblemId: {{problem.id}}</h3>
+        <mcc-color-picker style="position: relative; right: 10px" [selectedColor]="problem.color" (selected)='editProblemColor(competition, j, $event)'></mcc-color-picker>
         <button mat-mini-fab (click)='removeProblem(competition, j)' color='accent'><mat-icon>remove</mat-icon></button>
       </mat-card>
       <mat-card>

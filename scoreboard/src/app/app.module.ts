@@ -13,6 +13,7 @@ import { LoginComponent } from './login/login.component';
 import { AuthenticationResolver } from './service/authentication/authentication-resolver';
 import { AmazingTimePickerModule } from 'amazing-time-picker';
 import { CompetitionsComponent } from './competitions/competitions.component';
+import { MccColorPickerModule } from 'material-community-components';
 
 @NgModule({
    declarations: [
@@ -45,7 +46,8 @@ import { CompetitionsComponent } from './competitions/competitions.component';
       MatNativeDateModule,
       AmazingTimePickerModule,
       MatProgressBarModule,
-      MatDividerModule
+      MatDividerModule,
+      MccColorPickerModule
    ],
    providers: [
       AuthenticationResolver

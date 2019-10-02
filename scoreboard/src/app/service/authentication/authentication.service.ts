@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Utils } from 'src/utils';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -36,11 +37,11 @@ export class AuthenticationService {
   }
 
   isValid(token) {
-    return this.http.post(Utils.url + '/valid', {token: token});
+    return this.http.post(environment.api_url + '/valid', {token: token});
   }
 
   login(username, password) {
-    return this.http.post(Utils.url + '/login', {username: username, password: password}).subscribe((token: string) => {
+    return this.http.post(environment.api_url + '/login', {username: username, password: password}).subscribe((token: string) => {
       this.token = token, localStorage.setItem('token', token);
       this.route.navigate(['/admin']);
       console.log('Logged in');

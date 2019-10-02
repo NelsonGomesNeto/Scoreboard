@@ -3,13 +3,18 @@
   "version": "0.0.1",
   "description": "Simple scoreboard",
   "main": "server.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node server.js",
+    "restart": "node server.js"
+  },
   "author": "Nelson Gomes Neto",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "pg": "^7.12.1",
     "request": "^2.88.0"
   }
 }

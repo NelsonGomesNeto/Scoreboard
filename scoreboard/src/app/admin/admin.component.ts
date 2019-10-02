@@ -26,6 +26,8 @@ export class AdminComponent implements OnInit {
   newCompetitionEndDate = '';
   newCompetitionEndTime = '';
 
+  jkl = '';
+
   constructor(private server: RequestService, private authenticationService: AuthenticationService, private route: Router) { }
 
   ngOnInit() {
@@ -61,12 +63,19 @@ export class AdminComponent implements OnInit {
     })
   }
 
-  changeSchedule(competition: Competition) {
+  editInfo(competition: Competition) {
+    this.server.editInfo(competition.id, {name: this.newCompetitionName, id: this.newCompetitionId}).subscribe((updatedCompetition: Competition) => {
+      competition.name = updatedCompetition.name;
+      competition.id = updatedCompetition.id;
+    });
+  }
+
+  editSchedule(competition: Competition) {
     var startTime = new Date(this.newCompetitionStartDate);
     startTime.setHours(Number(this.newCompetitionStartTime.split(':')[0]), Number(this.newCompetitionStartTime.split(':')[1]));
     var endTime = new Date(this.newCompetitionEndDate);
     endTime.setHours(Number(this.newCompetitionEndTime.split(':')[0]), Number(this.newCompetitionEndTime.split(':')[1]));
-    this.server.changeSchedule(competition.id, {startTime: startTime.getTime(), endTime: endTime.getTime()}).subscribe((updatedCompetition: Competition) => {
+    this.server.editSchedule(competition.id, {startTime: startTime.getTime(), endTime: endTime.getTime()}).subscribe((updatedCompetition: Competition) => {
       competition.startTime = updatedCompetition.startTime;
       competition.endTime = updatedCompetition.endTime;
     });
@@ -82,6 +91,13 @@ export class AdminComponent implements OnInit {
   removeProblem(competition: Competition, j: number) {
     this.server.removeProblem(competition.id, competition.problems[j]).subscribe((updatedCompetition: Competition) => {
       competition.problems.splice(j, 1);
+    });
+  }
+
+  editProblemColor(competition: Competition, j: number, selectedColor: any) {
+    competition.problems[j].color = selectedColor;
+    this.server.editProblemColor(competition.id, competition.problems[j]).subscribe((updatedCompetition: Competition) => {
+      //
     });
   }
 
