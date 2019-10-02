@@ -94,7 +94,7 @@ export class StandingsComponent implements OnInit {
       
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
     });
-    setInterval(() => this.updateStandings(), 5000);
+    setInterval(() => this.updateStandings(), 10000);
   }
   
   updateStandings() {
