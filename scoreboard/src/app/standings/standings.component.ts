@@ -79,6 +79,8 @@ export class StandingsComponent implements OnInit {
       this.standings.competidors.forEach(competidor => {
         this.originalMap[competidor.id] = this.updatedMap[competidor.id] = this.position.length;
         this.position.push(this.position.length);
+        for (var j = 0; j < this.standings.problems.length; j ++)
+          competidor.problemsStatus[j].firstToSolve = competidor.problemsStatus[j].lastTime == this.standings.problems[j].firstSolve;
       });
       this.time = new Date(data.time);
       
@@ -106,8 +108,11 @@ export class StandingsComponent implements OnInit {
         this.updatedMap[this.updatedStandings.competidors[i].id] = i;
         let oi = this.originalMap[this.updatedStandings.competidors[i].id];
         for (var j = 0; j < this.standings.problems.length; j ++) {
-          if (this.standings.competidors[oi].problemsStatus[j].submissions < this.updatedStandings.competidors[i].problemsStatus[j].submissions)
+          this.updatedStandings.competidors[i].problemsStatus[j].firstToSolve = this.updatedStandings.competidors[i].problemsStatus[j].lastTime == this.updatedStandings.problems[j].firstSolve;
+          if (this.standings.competidors[oi].problemsStatus[j].submissions < this.updatedStandings.competidors[i].problemsStatus[j].submissions) {
             this.standings.competidors[oi].problemsStatus[j].accepted = -1;
+            this.standings.competidors[oi].problemsStatus[j].firstToSolve = this.updatedStandings.competidors[i].problemsStatus[j].firstToSolve;
+          }
           this.standings.competidors[oi].problemsStatus[j].lastTime = this.updatedStandings.competidors[i].problemsStatus[j].lastTime;
           this.standings.competidors[oi].problemsStatus[j].submissions = this.updatedStandings.competidors[i].problemsStatus[j].submissions;
         }

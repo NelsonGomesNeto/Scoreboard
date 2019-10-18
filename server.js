@@ -13,7 +13,7 @@ const path = require('path');
 const { Client } = require('pg');
 const production = false;
 
-// PRODUCTION DB
+//PRODUCTION DB
 // if (production) {
   const pgdb = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -94,6 +94,7 @@ async function updateCompetitionsSubmissions() {
         request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
           if (err || body == undefined) {
             console.log(err);
+            locked = false;
             return;
           }
           let ci = res.request.competitionIndex, cj = res.request.competidorIndex, ck = res.request.problemIndex;
@@ -106,17 +107,20 @@ async function updateCompetitionsSubmissions() {
             return;
           }
           var problemStatus = getById(aux[ci].competidors[cj].problemsStatus, aux[ci].problems[ck].id);
+          var problem = aux[ci].problems[ck];
           problemStatus.submissions = submissions.length;
           if (submissions.length) {
             problemStatus.accepted = submissions[0].evaluation == 'CORRECT';
             if (submissions[0].evaluation == 'WAITING') problemStatus.submissions --;
           }
           else
-            problemStatus.accepted = false;
+          problemStatus.accepted = false;
           if (submissions.length) {
             problemStatus.lastTime = Math.ceil((new Date(submissions[0].submissionDate).getTime() - new Date(aux[ci].startTime).getTime()) / (1000 * 60));
             aux[ci].competidors[cj].totalTime += problemStatus.accepted * Math.ceil(problemStatus.lastTime
-                                                                                             + problemStatus.accepted * (submissions.length - 1) * 15);
+                                                                                     + problemStatus.accepted * (submissions.length - 1) * 15);
+            if (problemStatus.accepted)
+              problem.firstSolve = problem.firstSolve == -1 ? problemStatus.lastTime : Math.min(problem.firstSolve, problemStatus.lastTime);
           }
           aux[ci].competidors[cj].totalAccepted += problemStatus.accepted;
           if (++ done == totalRequired) {
@@ -151,8 +155,8 @@ function loadDatabase() {
       console.log('Loaded data');
     });
   // } else {
-  //   db = fs.readFileSync(dbPath, 'utf8');
-  //   db = JSON.parse(db);
+    // db = fs.readFileSync(dbPath, 'utf8');
+    // db = JSON.parse(db);
   // }
 }
 
@@ -165,7 +169,7 @@ function saveDatabase() {
       }
     });
   // } else {
-  //   fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
+    // fs.writeFileSync(dbPath, JSON.stringify(db), 'utf8');
   // }
 }
 
@@ -370,9 +374,9 @@ function initServer() {
       console.log('Server running at http://${hostname}:${port}/');
     });
   // } else {
-  //   server.listen(port, hostname, () => {
-  //     console.log(`Server running at http://${hostname}:${port}/`);
-  //   });
+    // server.listen(port, hostname, () => {
+      // console.log(`Server running at http://${hostname}:${port}/`);
+    // });
   // }
 }
 

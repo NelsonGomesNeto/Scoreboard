@@ -17,7 +17,11 @@
           <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [@submitted]="getState(rowIndex, colIndex)">
           <!-- <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [ngStyle]="{backgroundColor: getColor(colIndex)}" [@submitted]="getState(rowIndex, colIndex)"> -->
             <div class="submission-time" [ngStyle]="{fontSize: 15 - column.cell(row, colIndex)[0].length + 'px'}">{{ column.cell(row, colIndex)[0] }}</div>
-            <img *ngIf="column.cell(row, colIndex)[0] != '-'; else noBalloon" class="balloon" src='../../assets/balloon.png'>
+            <!-- <img *ngIf="column.cell(row, colIndex)[0] != '-'; else noBalloon" class="balloon" src='../../assets/balloon-star.png'> -->
+            <div *ngIf="column.cell(row, colIndex)[0] != '-'; else noBalloon" class="balloon-inner-container">
+              <img *ngIf="column.cell(row, colIndex)[3] == true; else noStar" class="balloon" src='../../assets/balloon-star.png'>
+              <ng-template #noStar><img class="balloon" src='../../assets/balloon.png'></ng-template>
+            </div>
             <ng-template #noBalloon><div class="no-balloon"></div></ng-template>
             <div class="submission-count" [ngStyle]="{color: column.cell(row, colIndex)[2]}">{{ column.cell(row, colIndex)[1] }}</div>
           </div>
