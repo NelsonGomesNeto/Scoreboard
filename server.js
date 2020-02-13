@@ -58,6 +58,7 @@ async function login(username, password) {
       return;
     }
     huxleyToken = body['access_token'];
+    setTimeout(() => locked = false, 5000);
     // console.log("huxleyToken " + huxleyToken);
     // initServer();
   });
