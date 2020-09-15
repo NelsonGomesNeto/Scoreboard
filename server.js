@@ -232,7 +232,7 @@ function authenticated(token, res) {
 
 function initServer() {
   loadDatabase();
-  setInterval(updateCompetitionsSubmissions, 5000);
+  setInterval(updateCompetitionsSubmissions, production ? 5000 : 10000);
 
   huxleyToken = clientToken = null;
 
