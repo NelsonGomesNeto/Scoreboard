@@ -1,6 +1,6 @@
 {
   "name": "scoreboard-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple scoreboard",
   "main": "server.js",
   "scripts": {

@@ -61,9 +61,16 @@ table {
   /* text-shadow: 1px 1px black, -1px -1px black, -1px 1px black, 1px -1px black; */
 }
 
+.balloon-inner-container {
+  height: 41;
+  z-index: 2;
+  position: absolute;
+}
+
 .balloon {
   height: 41px;
   z-index: 2;
+  left: -20px;
   position: absolute;
 }
 .no-balloon {
