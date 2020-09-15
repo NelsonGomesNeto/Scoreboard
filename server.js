@@ -14,8 +14,9 @@ const { Client } = require("pg");
 const production = true;
 
 //PRODUCTION DB
+var pgdb;
 if (production) {
-  const pgdb = new Client({
+  pgdb = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true,
   });
