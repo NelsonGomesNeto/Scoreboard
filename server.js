@@ -143,7 +143,6 @@ function updateCompetitionsSubmissions() {
             }
             else
               problemStatus.accepted = false;
-            console.log(problemStatus);
   
             if (submissions.length) {
               problemStatus.lastTime = getSubmissionDeltaFromCompetitionStart(aux[ci].startTime, submissions[0].submissionDate);
