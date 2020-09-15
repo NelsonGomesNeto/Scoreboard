@@ -179,7 +179,7 @@ async function loadDatabase() {
           return;
         }
       } else {
-        db = res.rows[0].data;
+        db = data.rows[0].data;
       }
 
       console.log("Loaded data");
