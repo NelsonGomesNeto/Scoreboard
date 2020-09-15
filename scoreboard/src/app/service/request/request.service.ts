@@ -27,19 +27,19 @@ export class RequestService {
   }
 
   addCompetition(competition: Competition) {
-    return this.http.post(environment.api_url + '/competitions', {token: this.authenticationService.token, competition: competition});
+    return this.http.post(environment.api_url + '/competitions', {token: this.authenticationService.token, competition: competition}, {headers: {'token': this.authenticationService.token}});
   }
 
   editInfo(id: number, info: any) {
-    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/editInfo', {token: this.authenticationService.token, info: info});
+    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/editInfo', {token: this.authenticationService.token, info: info}, {headers: {'token': this.authenticationService.token}});
   }
 
   editSchedule(id: number, schedule: any) {
-    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/editSchedule', {token: this.authenticationService.token, schedule: schedule});
+    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/editSchedule', {token: this.authenticationService.token, schedule: schedule}, {headers: {'token': this.authenticationService.token}});
   }
 
   addProblem(id: number, problem: Problem) {
-    return this.http.put(environment.api_url + '/competition/' + id.toString() + '/newProblem', {token: this.authenticationService.token, problem: problem})
+    return this.http.put(environment.api_url + '/competition/' + id.toString() + '/newProblem', {token: this.authenticationService.token, problem: problem}, {headers: {'token': this.authenticationService.token}})
   }
 
   removeProblem(id: number, problem: Problem) {
@@ -47,11 +47,11 @@ export class RequestService {
   }
 
   editProblemColor(id: number, problem: Problem) {
-    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/problem/' + problem.id.toString(), {token: this.authenticationService.token, color: problem.color});
+    return this.http.patch(environment.api_url + '/competition/' + id.toString() + '/problem/' + problem.id.toString(), {token: this.authenticationService.token, color: problem.color}, {headers: {'token': this.authenticationService.token}});
   }
   
   addCompetidor(id: number, competidor: Competidor) {
-    return this.http.put(environment.api_url + '/competition/' + id.toString() + '/newCompetidor', {token: this.authenticationService.token, competidor: competidor});
+    return this.http.put(environment.api_url + '/competition/' + id.toString() + '/newCompetidor', {token: this.authenticationService.token, competidor: competidor}, {headers: {'token': this.authenticationService.token}});
   }
 
   removeCompetidor(id: number, competidor: Competidor) {
