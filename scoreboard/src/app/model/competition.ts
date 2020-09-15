@@ -6,14 +6,16 @@ export class Competition {
   name: string;
   startTime: Date;
   endTime: Date;
+  frozenMinutes: number;
   competidors: Competidor[];
   problems: Problem[];
 
-  constructor(id: number, name: string, startTime: Date = new Date(), endTime: Date = new Date(), competidors: Competidor[] = new Array(), problems: Problem[] = new Array()) {
+  constructor(id: number, name: string, startTime: Date = new Date(), endTime: Date = new Date(), fronzenMinutes: number = 0, competidors: Competidor[] = new Array(), problems: Problem[] = new Array()) {
     this.id = id;
     this.name = name;
     this.startTime = startTime;
     this.endTime = endTime;
+    this.frozenMinutes = fronzenMinutes;
     this.competidors = competidors;
     this.problems = problems;
   }
