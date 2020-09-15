@@ -133,6 +133,8 @@ function updateCompetitionsSubmissions() {
               return;
             }
   
+            var problem = aux[ci].problems[ck];
+
             var problemStatus = getById(aux[ci].competidors[cj].problemsStatus, aux[ci].problems[ck].id);
             problemStatus.submissions = submissions.length;
             if (submissions.length > 0) {
@@ -145,6 +147,8 @@ function updateCompetitionsSubmissions() {
             if (submissions.length) {
               problemStatus.lastTime = getSubmissionDeltaFromCompetitionStart(aux[ci].startTime, submissions[0].submissionDate);
               aux[ci].competidors[cj].totalTime += calculateTotalTime(problemStatus.accepted, problemStatus.lastTime, submissions.length);
+              if (problemStatus.accepted)
+              problem.firstSolve = problem.firstSolve == -1 ? problemStatus.lastTime : Math.min(problem.firstSolve, problemStatus.lastTime);
             }
             aux[ci].competidors[cj].totalAccepted += problemStatus.accepted;
   
@@ -307,7 +311,6 @@ function initServer() {
     deleteById(competition.competidors, newCompetidor.id);
     competition.competidors.push(newCompetidor);
     competition.competidors.sort(sortById);
-    console.log(competition);
 
     saveDatabase();
     res.json(newCompetidor);

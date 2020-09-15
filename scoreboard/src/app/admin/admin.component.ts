@@ -59,7 +59,7 @@ export class AdminComponent implements OnInit {
     startTime.setHours(Number(this.newCompetitionStartTime.split(':')[0]), Number(this.newCompetitionStartTime.split(':')[1]));
     var endTime = new Date(this.newCompetitionEndDate);
     endTime.setHours(Number(this.newCompetitionEndTime.split(':')[0]), Number(this.newCompetitionEndTime.split(':')[1]));
-    let fronzenMinutes = Number.isNaN(this.newCompetitionFrozenMinutes) ? 0 : Number(this.newCompetitionFrozenMinutes);
+    let fronzenMinutes = Number.isNaN(Number(this.newCompetitionFrozenMinutes)) ? 0 : Number(this.newCompetitionFrozenMinutes);
 
     this.server.addCompetition(new Competition(Number(this.newCompetitionId), this.newCompetitionName, startTime, endTime, fronzenMinutes)).subscribe(
       (newCompetition: Competition) => {
@@ -89,7 +89,7 @@ export class AdminComponent implements OnInit {
     startTime.setHours(Number(this.newCompetitionStartTime.split(':')[0]), Number(this.newCompetitionStartTime.split(':')[1]));
     var endTime = new Date(this.newCompetitionEndDate);
     endTime.setHours(Number(this.newCompetitionEndTime.split(':')[0]), Number(this.newCompetitionEndTime.split(':')[1]));
-    let fronzenMinutes = Number.isNaN(this.newCompetitionFrozenMinutes) ? 0 : Number(this.newCompetitionFrozenMinutes);
+    let fronzenMinutes = Number.isNaN(Number(this.newCompetitionFrozenMinutes)) ? 0 : Number(this.newCompetitionFrozenMinutes);
 
     this.server.editSchedule(competition.id, {startTime: startTime.getTime(), endTime: endTime.getTime(), frozenMinutes: fronzenMinutes}).subscribe((updatedCompetition: Competition) => {
       competition.startTime = updatedCompetition.startTime;
