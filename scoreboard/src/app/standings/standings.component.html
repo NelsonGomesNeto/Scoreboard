@@ -1,9 +1,11 @@
 <mat-card>
   <mat-card-title>{{standings.name}} || {{standings.id}}</mat-card-title>
   <mat-card-subtitle>{{standings.startTime | date:'d/M/yy hh:mm z'}} to {{standings.endTime | date:'d/M/yy hh:mm z'}}</mat-card-subtitle>
-  <mat-progress-bar mode="determinate" [value]="progressBarValue"></mat-progress-bar>
+  <mat-progress-bar mode="determinate" [value]="progressBarValue" style='height: 8px'></mat-progress-bar>
 </mat-card>
-<div>
+<div class='standings'>
+  <div id='frozen-image' [@updatedFreezeState]="getFreezeState()"></div>
+
   <mat-table #table [dataSource]="standings.competidors">
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
@@ -13,7 +15,7 @@
         {{ column.header }}
       </mat-header-cell>
       <mat-cell *matCellDef="let row; let rowIndex = index" class="centralized-column">
-        <div class="standing" [ngStyle]="{top: 175 + position[rowIndex] * 48 + 'px'}">
+        <div class="standing" [ngStyle]="{top: 75 + position[rowIndex] * 48 + 'px'}">
           <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [@submitted]="getState(rowIndex, colIndex)">
           <!-- <div class="balloon-container" *ngIf="colIndex > 0 && colIndex <= standings.problems.length; else elseBlock" [ngStyle]="{backgroundColor: getColor(colIndex)}" [@submitted]="getState(rowIndex, colIndex)"> -->
             <div class="submission-time" [ngStyle]="{fontSize: 15 - column.cell(row, colIndex)[0].length + 'px'}">{{ column.cell(row, colIndex)[0] }}</div>

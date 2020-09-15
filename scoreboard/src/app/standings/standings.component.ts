@@ -11,6 +11,18 @@ import { trigger, state, style, transition, animate, keyframes } from '@angular/
 @Component({
   selector: 'app-standings',
   animations: [
+    trigger('updatedFreezeState', [
+      state('frozen', style({
+        opacity: 1
+      })),
+      state('notFrozen', style({
+        opacity: 0
+      })),
+
+      transition('frozen <=> notFrozen',
+        animate('3s')
+      )
+    ]),
     trigger('submitted', [
       state('noBalloon', style({
         backgroundColor: 'white'
@@ -96,7 +108,17 @@ export class StandingsComponent implements OnInit {
     });
     setInterval(() => this.updateStandings(), 5000);
   }
-  
+
+  frozenScoreboard() {
+    let endTime = new Date(this.standings.endTime);
+    let freezeTime = new Date(endTime.getTime() - this.standings.frozenMinutes * 60000).getTime();
+    return this.time.getTime() >= freezeTime && this.time.getTime() < endTime.getTime();
+  }
+
+  getFreezeState() {
+    return this.frozenScoreboard() ? 'frozen' : 'notFrozen';
+  }
+
   updateStandings() {
     this.server.getStandings(this.id).subscribe((data: any) => {
       this.updatedStandings = Competition.parse(data.standings);
@@ -107,14 +129,14 @@ export class StandingsComponent implements OnInit {
         let oi = this.originalMap[this.updatedStandings.competidors[i].id];
         for (var j = 0; j < this.standings.problems.length; j ++) {
           if (this.standings.competidors[oi].problemsStatus[j].submissions < this.updatedStandings.competidors[i].problemsStatus[j].submissions)
-            this.standings.competidors[oi].problemsStatus[j].accepted = -1;
+          this.standings.competidors[oi].problemsStatus[j].accepted = -1;
           this.standings.competidors[oi].problemsStatus[j].lastTime = this.updatedStandings.competidors[i].problemsStatus[j].lastTime;
           this.standings.competidors[oi].problemsStatus[j].submissions = this.updatedStandings.competidors[i].problemsStatus[j].submissions;
         }
       }
       this.standings.startTime = this.updatedStandings.startTime;
       this.standings.endTime = this.updatedStandings.endTime;
-
+      
       this.time = new Date(data.time);
       this.progressBarValue = 100 * (this.time.getTime() - this.standings.startTime.getTime()) / (this.standings.endTime.getTime() - this.standings.startTime.getTime());
       console.log('refreshed standings');

@@ -14,8 +14,9 @@
             <br>
             {{competition.startTime | date:'d/M/yy hh:mm z'}} to {{competition.endTime | date:'d/M/yy hh:mm z'}}
           </mat-panel-description>
-          <!-- <button mat-icon-button (click)='goTo(competition)' color='accent'><mat-icon>add</mat-icon></button> -->
-          <button mat-mini-fab (click)='goTo(competition)' color='accent'>View</button>
+          <div class='accordion-button'>
+            <button mat-mini-fab (click)='goTo(competition)' color='accent'>View</button>
+          </div>
         </mat-expansion-panel-header>
 
         <mat-progress-bar mode="determinate" [value]="this.progressBars[i]"mat-progress-bar></mat-progress-bar>

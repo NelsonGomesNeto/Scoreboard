@@ -14,8 +14,9 @@ const { Client } = require("pg");
 const production = false;
 
 // PRODUCTION DB
+var pgdb;
 if (production) {
-  const pgdb = new Client({
+  pgdb = new Client({
     connectionString: process.env.DATABASE_URL,
     ssl: true,
   });
@@ -74,10 +75,10 @@ function didExpire(competition) {
   return new Date(endTime.getTime()) > expirationTime;
 }
 
-// Will freeze the scoreboard in the last 15 minutes of competition
+// Will freeze the scoreboard in the last x minutes
 function freezeScoreboard(competition) {
   let endTime = new Date(competition.endTime);
-  let freezeTime = new Date(endTime.getTime() - 15 * 60000).getTime();
+  let freezeTime = new Date(endTime.getTime() - competition.frozenMinutes * 60000).getTime();
   return Date.now() >= freezeTime && Date.now() < endTime.getTime()
 }
 
@@ -107,8 +108,6 @@ function updateCompetitionsSubmissions() {
   
     for (var i = 0; i < aux.length; i++) {// for each competition
       if (didExpire(aux[i]) || freezeScoreboard(aux[i])) {
-        if (freezeScoreboard(aux[i]))
-          console.log("Scoreboard on", aux[i].name, "freezed");
         continue;
       }
   
@@ -142,7 +141,6 @@ function updateCompetitionsSubmissions() {
             }
             else
               problemStatus.accepted = false;
-            console.log(problemStatus);
   
             if (submissions.length) {
               problemStatus.lastTime = getSubmissionDeltaFromCompetitionStart(aux[ci].startTime, submissions[0].submissionDate);
@@ -178,7 +176,7 @@ async function loadDatabase() {
           return;
         }
       } else {
-        db = res.rows[0].data;
+        db = data.rows[0].data;
       }
 
       console.log("Loaded data");
@@ -232,7 +230,7 @@ function authenticated(token, res) {
 
 function initServer() {
   loadDatabase();
-  setInterval(updateCompetitionsSubmissions, 5000);
+  setInterval(updateCompetitionsSubmissions, production ? 5000 : 10000);
 
   huxleyToken = clientToken = null;
 
@@ -261,7 +259,7 @@ function initServer() {
       return;
 
     var newCompetition = req.body.competition;
-    newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime);
+    newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime, newCompetition.frozenMinutes);
     db["competitions"].push(newCompetition);
 
     saveDatabase();
@@ -287,6 +285,7 @@ function initServer() {
     var competition = getById(db["competitions"], req.params.id);
     competition.startTime = new Date(req.body.schedule.startTime);
     competition.endTime = new Date(req.body.schedule.endTime);
+    competition.frozenMinutes = req.body.schedule.frozenMinutes;
 
     saveDatabase();
     res.json(competition);
@@ -304,10 +303,11 @@ function initServer() {
       newCompetidor.problemsStatus.push(new ProblemStatus(competition.problems[i].id));
       newCompetidor.problemsStatus.sort(sortById);
     }
-
+    
     deleteById(competition.competidors, newCompetidor.id);
     competition.competidors.push(newCompetidor);
     competition.competidors.sort(sortById);
+    console.log(competition);
 
     saveDatabase();
     res.json(newCompetidor);
