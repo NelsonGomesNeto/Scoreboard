@@ -234,7 +234,7 @@ function authenticated(token, res) {
 
 function initServer() {
   loadDatabase();
-  setInterval(updateCompetitionsSubmissions, production ? 5000 : 10000);
+  setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
 
   huxleyToken = clientToken = null;
 
