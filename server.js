@@ -108,6 +108,7 @@ function updateCompetitionsSubmissions() {
   
     for (var i = 0; i < aux.length; i++) {// for each competition
       if (didExpire(aux[i]) || freezeScoreboard(aux[i])) {
+        done += aux[i].competidors.length * aux[i].problems.length;
         continue;
       }
   
@@ -119,7 +120,6 @@ function updateCompetitionsSubmissions() {
                     + "&submissionDateGe=" + getHuxleyDateString(aux[i].startTime, -1) + "&submissionDateLe=" + getHuxleyDateString(aux[i].endTime, 1)
                     + "&max=100");
           request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
-            console.log("here");
             if (err || body == undefined) {
               console.log(err);
               return;
