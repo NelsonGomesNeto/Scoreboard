@@ -109,6 +109,12 @@ function updateCompetitionsSubmissions() {
     for (var i = 0; i < aux.length; i++) {// for each competition
       if (didExpire(aux[i]) || freezeScoreboard(aux[i])) {
         done += aux[i].competidors.length * aux[i].problems.length;
+        if (done == totalRequired) {
+          console.log("Updated competitions submissions successfully");
+          db["competitions"] = aux;
+          saveDatabase();
+          break;
+        }
         continue;
       }
   
