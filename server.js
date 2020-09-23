@@ -162,6 +162,7 @@ function updateCompetitionsSubmissions() {
             if (++done == totalRequired) {
               console.log("Updated competitions submissions successfully");
               db["competitions"] = aux;
+              console.log(aux[ci]);
               saveDatabase();
             }
           });
