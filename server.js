@@ -71,8 +71,7 @@ function getHuxleyDateString(date, minuteShift) {
 // Will continue updating the scoreboard for 30 minutes after the competition is over
 function didExpire(competition) {
   let endTime = new Date(competition.endTime);
-  let expirationTime = new Date(Date.now() + 30 * 60000).getTime()
-  return new Date(endTime.getTime()) > expirationTime;
+  return new Date(endTime.getTime() + 30 * 60000).getTime() < Date.now();
 }
 
 // Will freeze the scoreboard in the last x minutes
@@ -162,7 +161,6 @@ function updateCompetitionsSubmissions() {
             if (++done == totalRequired) {
               console.log("Updated competitions submissions successfully");
               db["competitions"] = aux;
-              console.log(aux[ci]);
               saveDatabase();
             }
           });
