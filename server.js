@@ -119,6 +119,7 @@ function updateCompetitionsSubmissions() {
                     + "&submissionDateGe=" + getHuxleyDateString(aux[i].startTime, -1) + "&submissionDateLe=" + getHuxleyDateString(aux[i].endTime, 1)
                     + "&max=100");
           request.get({url: url, headers: headers, competitionIndex: i, competidorIndex: j, problemIndex: k}, (err, res, body) => {
+            console.log("here");
             if (err || body == undefined) {
               console.log(err);
               return;
