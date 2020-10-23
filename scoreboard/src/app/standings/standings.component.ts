@@ -13,7 +13,7 @@ import { trigger, state, style, transition, animate, keyframes } from '@angular/
   animations: [
     trigger('updatedFreezeState', [
       state('frozen', style({
-        opacity: 1
+        opacity: 0.5
       })),
       state('notFrozen', style({
         opacity: 0
