@@ -97,8 +97,6 @@ function updateCompetitionsSubmissions() {
       return;
     }
 
-    console.log("db:", db);
-
     // https://www.thehuxley.com/api/v1/submissions?submissionDateGe=2017-10-28T17:22:54-03:00&user=5875&submissionDateLe=2017-10-28T17:22:56-03:00&problem=794
     // Ge == Greater, Le == Less
     let headers = {"Authorization": "Bearer " + huxleyToken, "Content-Type": "application/json"};
@@ -177,17 +175,12 @@ function updateCompetitionsSubmissions() {
 
 async function loadDatabase() {
   if (production) {
-    console.log("init", process.env.DATABASE_URL);
     db = {"competitions": []};
     try {
-      console.log("query");
       pgdb.query("SELECT data FROM db", [], (err, data) => {
         if (err) {
           console.log("Couldn't query", error);
         } else {
-          console.log("result:");
-          console.log("data");
-          console.log("wtf:", data, data.rows);
     
           if (data.rows.length == 0) {
             pgdb.query("INSERT INTO db(key, data) values($1, $2)", [1, "{\"competitions\": []}"]).catch((error) => {
@@ -195,7 +188,6 @@ async function loadDatabase() {
             });
           } else {
             db = data.rows[0].data;
-            console.log("db: ", db);
           }
     
           console.log("Loaded data");
@@ -250,8 +242,8 @@ function authenticated(token, res) {
 }
 
 function reloader() {
-  setTimeout(() => setInterval(() => loadDatabase(), 10000), 3000);
-  // setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 3000);
+  loadDatabase();
+  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 3000);
 }
 
 function initServer() {
