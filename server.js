@@ -184,6 +184,7 @@ async function loadDatabase() {
   if (production) {
     db = {"competitions": []};
     try {
+      pgdb.connect();
       data = await pgdb.query("SELECT data FROM db");
 
       if (data.rows.length == 0) {
@@ -253,7 +254,7 @@ function reloader() {
 }
 
 function initServer() {
-  setTimeout(() => reloader(), 20000);
+  setTimeout(() => reloader(), 30000);
 
   huxleyToken = clientToken = null;
 
