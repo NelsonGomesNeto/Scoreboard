@@ -27,6 +27,7 @@ if (production) {
     } else {
       console.log("Created table");
     }
+    pgdb.end();
   });
 }
 
@@ -177,6 +178,7 @@ function updateCompetitionsSubmissions() {
 
 async function loadDatabase() {
   if (production) {
+    pgdb.connect();
     console.log("init");
     db = {"competitions": []};
     try {
