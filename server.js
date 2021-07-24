@@ -97,12 +97,7 @@ function updateCompetitionsSubmissions() {
       return;
     }
 
-    console.log("db: ", db);
-    pgdb.query("SELECT data FROM db").then((lol) => {
-      console.log("wtf: ", lol);
-    }).catch((err) => {
-      console.log("jqowifqwj: ", err);
-    });
+    console.log("db:", db);
 
     // https://www.thehuxley.com/api/v1/submissions?submissionDateGe=2017-10-28T17:22:54-03:00&user=5875&submissionDateLe=2017-10-28T17:22:56-03:00&problem=794
     // Ge == Greater, Le == Less
@@ -185,6 +180,8 @@ async function loadDatabase() {
     db = {"competitions": []};
     try {
       data = await pgdb.query("SELECT data FROM db");
+
+      console.log("wtf:", data, data.rows);
 
       if (data.rows.length == 0) {
         try {
