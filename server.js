@@ -20,15 +20,14 @@ if (production) {
     connectionString: process.env.DATABASE_URL,
     ssl: true,
   });
-  pgdb.connect();
-  pgdb.query("CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)", (err, res) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Created table");
-    }
-    pgdb.end();
-  });
+  // pgdb.connect();
+  // pgdb.query("CREATE TABLE IF NOT EXISTS db(key INTEGER PRIMARY KEY, data JSONB)", (err, res) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log("Created table");
+  //   }
+  // });
 }
 
 const hostname = "localhost";
