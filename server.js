@@ -177,9 +177,13 @@ function updateCompetitionsSubmissions() {
 
 async function loadDatabase() {
   if (production) {
+    console.log("init");
     db = {"competitions": []};
     try {
+      console.log("query");
       pgdb.query("SELECT data FROM db").then((data) => {
+        console.log("result:");
+        console.log("data");
         console.log("wtf:", data, data.rows);
   
         if (data.rows.length == 0) {
