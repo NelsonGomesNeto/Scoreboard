@@ -243,13 +243,13 @@ function authenticated(token, res) {
 
 function reloader() {
   loadDatabase();
-  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 10000);
+  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 3000);
 }
 
 function initServer() {
   setTimeout(() => reloader(), 0);
 
-  setTimeout(() => initServer2(), 10000);
+  setTimeout(() => initServer2(), 3000);
 }
 function initServer2() {
   huxleyToken = clientToken = null;
