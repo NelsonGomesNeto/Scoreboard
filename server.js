@@ -181,24 +181,26 @@ async function loadDatabase() {
     db = {"competitions": []};
     try {
       console.log("query");
-      pgdb.query("SELECT data FROM db").then((data) => {
-        console.log("result:");
-        console.log("data");
-        console.log("wtf:", data, data.rows);
-  
-        if (data.rows.length == 0) {
-          pgdb.query("INSERT INTO db(key, data) values($1, $2)", [1, "{\"competitions\": []}"]).catch((error) => {
-            console.log(error);
-          });
+      pgdb.query("SELECT data FROM db", [], (err, data) => {
+        if (err) {
+          console.log("Couldn't query", error);=
         } else {
-          db = data.rows[0].data;
-          console.log("db: ", db);
+          console.log("result:");
+          console.log("data");
+          console.log("wtf:", data, data.rows);
+    
+          if (data.rows.length == 0) {
+            pgdb.query("INSERT INTO db(key, data) values($1, $2)", [1, "{\"competitions\": []}"]).catch((error) => {
+              console.log(error);
+            });
+          } else {
+            db = data.rows[0].data;
+            console.log("db: ", db);
+          }
+    
+          console.log("Loaded data");
         }
-  
-        console.log("Loaded data");
-      }).catch((error) => {
-        console.log("Couldn't query", error);
-      });
+      })
     } catch (error) {
       console.log("Couldn't load data from db", error);
       return;
