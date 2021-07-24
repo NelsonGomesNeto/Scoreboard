@@ -247,9 +247,13 @@ function authenticated(token, res) {
   return true;
 }
 
-function initServer() {
+function reloader() {
   loadDatabase();
   setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
+}
+
+function initServer() {
+  setTimeout(() => reloader(), 20000);
 
   huxleyToken = clientToken = null;
 
