@@ -196,6 +196,8 @@ async function loadDatabase() {
         }
   
         console.log("Loaded data");
+      }).catch((error) => {
+        console.log("Couldn't query", error);
       });
     } catch (error) {
       console.log("Couldn't load data from db", error);
