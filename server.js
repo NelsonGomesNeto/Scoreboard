@@ -193,6 +193,7 @@ async function loadDatabase() {
         }
       } else {
         db = data.rows[0].data;
+        console.log("db: ", db);
       }
 
       console.log("Loaded data");
@@ -433,7 +434,7 @@ function initServer() {
 
   if (production) {
     server.listen(process.env.PORT || 5000, () => {
-      console.log("Server running at http://${hostname}:${port}/");
+      console.log(`Server running at http://${hostname}:${process.env.PORT}/`);
     });
   } else {
     server.listen(port, hostname, () => {
