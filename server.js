@@ -17,12 +17,7 @@ const production = true;
 var pgdb;
 if (production) {
   pgdb = new Client({
-    host: 'ec2-54-225-113-7.compute-1.amazonaws.com',
-    database: 'd1pnt8ase0npfn',
-    user: 'owptycjdwkohbe',
-    port: '5432',
-    password: '4fca17391d4ae7e9311d00db393409bb714f7358feedb0812fb22873c5890720',
-    // connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL,
     ssl: true,
   });
   pgdb.connect();
