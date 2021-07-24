@@ -101,7 +101,9 @@ function updateCompetitionsSubmissions() {
       console.log("Couldn't update because huxleyToken is null");
       return;
     }
-  
+
+    console.log("db: ", db);
+
     // https://www.thehuxley.com/api/v1/submissions?submissionDateGe=2017-10-28T17:22:54-03:00&user=5875&submissionDateLe=2017-10-28T17:22:56-03:00&problem=794
     // Ge == Greater, Le == Less
     let headers = {"Authorization": "Bearer " + huxleyToken, "Content-Type": "application/json"};
