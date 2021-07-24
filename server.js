@@ -175,27 +175,24 @@ function updateCompetitionsSubmissions() {
   }
 }
 
-async function loadDatabase() {
+function loadDatabase() {
   if (production) {
     db = {"competitions": []};
     try {
-      data = await pgdb.query("SELECT data FROM db");
-
-      console.log("wtf:", data, data.rows);
-
-      if (data.rows.length == 0) {
-        try {
-          await pgdb.query("INSERT INTO db(key, data) values($1, $2)", [1, "{\"competitions\": []}"]);
-        } catch (error) {
-          console.log(error);
-          return;
+      pgdb.query("SELECT data FROM db").then((data) => {
+        console.log("wtf:", data, data.rows);
+  
+        if (data.rows.length == 0) {
+          pgdb.query("INSERT INTO db(key, data) values($1, $2)", [1, "{\"competitions\": []}"]).catch((error) => {
+            console.log(error);
+          });
+        } else {
+          db = data.rows[0].data;
+          console.log("db: ", db);
         }
-      } else {
-        db = data.rows[0].data;
-        console.log("db: ", db);
-      }
-
-      console.log("Loaded data");
+  
+        console.log("Loaded data");
+      });
     } catch (error) {
       console.log("Couldn't load data from db", error);
       return;
@@ -250,8 +247,11 @@ function reloader() {
 }
 
 function initServer() {
-  setTimeout(() => reloader(), 30000);
+  setTimeout(() => reloader(), 0);
 
+  setTimeout(() => initServer2(), 10000);
+}
+function initServer2() {
   huxleyToken = clientToken = null;
 
   const server = express();
