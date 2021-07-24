@@ -184,7 +184,6 @@ async function loadDatabase() {
   if (production) {
     db = {"competitions": []};
     try {
-      pgdb.connect();
       data = await pgdb.query("SELECT data FROM db");
 
       if (data.rows.length == 0) {
@@ -250,7 +249,7 @@ function authenticated(token, res) {
 
 function reloader() {
   loadDatabase();
-  setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
+  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 10000);
 }
 
 function initServer() {
