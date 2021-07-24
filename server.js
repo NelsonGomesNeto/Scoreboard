@@ -238,204 +238,204 @@ function authenticated(token, res) {
   return true;
 }
 
-function initServer() {
-  loadDatabase().then(() => {
-    console.log("Successfully loaded db");
-    setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
+async function initServer() {
+  await loadDatabase();
+  console.log("Successfully loaded database");
+
+  setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
+
+  huxleyToken = clientToken = null;
+
+  const server = express();
+  server.use(cors());
+  server.use(express.static(path.join(__dirname, "public")));
+  server.use(bodyParser.json());
+  server.use(bodyParser.text());
+  server.use(bodyParser.raw());
+  server.use(bodyParser.urlencoded({extended: true}));
+  server.use(function(req, res, next) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE, PATCH");
+    res.setHeader("Access-Control-Allow-Headers", "content-type, token");
+    // res.setHeader("Content-Type", "application/json");
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    next();
+  });
+
+  server.get("/api/competitions", (req, res) => {
+    res.json({competitions: db["competitions"], time: Date.now()});
+  });
+
+  server.post("/api/competitions", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var newCompetition = req.body.competition;
+    newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime, newCompetition.frozenMinutes);
+    db["competitions"].push(newCompetition);
+
+    saveDatabase();
+    res.json(newCompetition);
+  });
+
+  server.patch("/api/competition/:id/editInfo", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var competition = getById(db["competitions"], req.params.id);
+    competition.name = req.body.info.name;
+    competition.id = req.body.info.id;
+
+    saveDatabase();
+    res.json(competition);
+  });
+
+  server.patch("/api/competition/:id/editSchedule", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var competition = getById(db["competitions"], req.params.id);
+    competition.startTime = new Date(req.body.schedule.startTime);
+    competition.endTime = new Date(req.body.schedule.endTime);
+    competition.frozenMinutes = req.body.schedule.frozenMinutes;
+
+    saveDatabase();
+    res.json(competition);
+  });
   
-    huxleyToken = clientToken = null;
-  
-    const server = express();
-    server.use(cors());
-    server.use(express.static(path.join(__dirname, "public")));
-    server.use(bodyParser.json());
-    server.use(bodyParser.text());
-    server.use(bodyParser.raw());
-    server.use(bodyParser.urlencoded({extended: true}));
-    server.use(function(req, res, next) {
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE, PATCH");
-      res.setHeader("Access-Control-Allow-Headers", "content-type, token");
-      // res.setHeader("Content-Type", "application/json");
-      res.setHeader("Access-Control-Allow-Credentials", true);
-      next();
-    });
-  
-    server.get("/api/competitions", (req, res) => {
-      res.json({competitions: db["competitions"], time: Date.now()});
-    });
-  
-    server.post("/api/competitions", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var newCompetition = req.body.competition;
-      newCompetition = new Competition(newCompetition.id, newCompetition.name, newCompetition.startTime, newCompetition.endTime, newCompetition.frozenMinutes);
-      db["competitions"].push(newCompetition);
-  
-      saveDatabase();
-      res.json(newCompetition);
-    });
-  
-    server.patch("/api/competition/:id/editInfo", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var competition = getById(db["competitions"], req.params.id);
-      competition.name = req.body.info.name;
-      competition.id = req.body.info.id;
-  
-      saveDatabase();
-      res.json(competition);
-    });
-  
-    server.patch("/api/competition/:id/editSchedule", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var competition = getById(db["competitions"], req.params.id);
-      competition.startTime = new Date(req.body.schedule.startTime);
-      competition.endTime = new Date(req.body.schedule.endTime);
-      competition.frozenMinutes = req.body.schedule.frozenMinutes;
-  
-      saveDatabase();
-      res.json(competition);
-    });
+  server.put("/api/competition/:id/newCompetidor", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var newCompetidor = req.body.competidor;
+    var competition = getById(db["competitions"], req.params.id);
+    newCompetidor = new Competidor(newCompetidor.id, newCompetidor.name);
+
+    for (var i = 0; i < competition.problems.length; i++) {
+      newCompetidor.problemsStatus.push(new ProblemStatus(competition.problems[i].id));
+      newCompetidor.problemsStatus.sort(sortById);
+    }
     
-    server.put("/api/competition/:id/newCompetidor", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var newCompetidor = req.body.competidor;
-      var competition = getById(db["competitions"], req.params.id);
-      newCompetidor = new Competidor(newCompetidor.id, newCompetidor.name);
-  
-      for (var i = 0; i < competition.problems.length; i++) {
-        newCompetidor.problemsStatus.push(new ProblemStatus(competition.problems[i].id));
-        newCompetidor.problemsStatus.sort(sortById);
-      }
-      
-      deleteById(competition.competidors, newCompetidor.id);
-      competition.competidors.push(newCompetidor);
+    deleteById(competition.competidors, newCompetidor.id);
+    competition.competidors.push(newCompetidor);
+    competition.competidors.sort(sortById);
+
+    saveDatabase();
+    res.json(newCompetidor);
+  });
+
+  server.put("/api/competition/:id/newProblem", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var newProblem = req.body.problem;
+    newProblem = new Problem(newProblem.id);
+
+    var competition = getById(db["competitions"], req.params.id);
+    deleteById(competition.problems, newProblem.id);
+    competition.problems.push(newProblem);
+    competition.problems.sort(sortById);
+
+    for (var i = 0; i < competition.competidors.length; i++) {
+      deleteById(competition.competidors[i].problemsStatus, newProblem.id);
+      competition.competidors[i].problemsStatus.push(new ProblemStatus(newProblem.id));
+      competition.competidors[i].problemsStatus.sort(sortById);
+    }
+
+    saveDatabase();
+    res.json(newProblem);
+  });
+
+  server.delete("/api/competition/:id", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    deleteById(db["competitions"], req.params.id);
+
+    saveDatabase();
+    res.json(db["competitions"]);
+  });
+
+  server.delete("/api/competition/:competitionId/competidor/:competidorId", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var competition = getById(db["competitions"], req.params.competitionId);
+    if (competition) {
+      deleteById(competition.competidors, req.params.competidorId);
       competition.competidors.sort(sortById);
-  
-      saveDatabase();
-      res.json(newCompetidor);
-    });
-  
-    server.put("/api/competition/:id/newProblem", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var newProblem = req.body.problem;
-      newProblem = new Problem(newProblem.id);
-  
-      var competition = getById(db["competitions"], req.params.id);
-      deleteById(competition.problems, newProblem.id);
-      competition.problems.push(newProblem);
+    }
+
+    saveDatabase();
+    res.json(competition);
+  });
+
+  server.delete("/api/competition/:competitionId/problem/:problemId", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var competition = getById(db["competitions"], req.params.competitionId);
+    if (competition) {
+      deleteById(competition.problems, req.params.problemId);
       competition.problems.sort(sortById);
-  
-      for (var i = 0; i < competition.competidors.length; i++) {
-        deleteById(competition.competidors[i].problemsStatus, newProblem.id);
-        competition.competidors[i].problemsStatus.push(new ProblemStatus(newProblem.id));
-        competition.competidors[i].problemsStatus.sort(sortById);
-      }
-  
-      saveDatabase();
-      res.json(newProblem);
-    });
-  
-    server.delete("/api/competition/:id", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      deleteById(db["competitions"], req.params.id);
-  
-      saveDatabase();
-      res.json(db["competitions"]);
-    });
-  
-    server.delete("/api/competition/:competitionId/competidor/:competidorId", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var competition = getById(db["competitions"], req.params.competitionId);
-      if (competition) {
-        deleteById(competition.competidors, req.params.competidorId);
-        competition.competidors.sort(sortById);
-      }
-  
-      saveDatabase();
-      res.json(competition);
-    });
-  
-    server.delete("/api/competition/:competitionId/problem/:problemId", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var competition = getById(db["competitions"], req.params.competitionId);
-      if (competition) {
-        deleteById(competition.problems, req.params.problemId);
-        competition.problems.sort(sortById);
-      }
-  
-      saveDatabase();
-      res.json(competition);
-    });
-  
-    server.patch("/api/competition/:competitionId/problem/:problemId", (req, res) => {
-      if (!authenticated(req.headers.token, res))
-        return;
-  
-      var competition = getById(db["competitions"], req.params.competitionId);
-      if (competition) {
-        var problem = getById(competition.problems, req.params.problemId);
-        problem.color = req.body.color;
-      }
-  
-      saveDatabase();
-      res.json(competition);
-    });
-  
-    server.get("/api/standings/:id", (req, res) => {
-      res.json({standings: getById(db["competitions"], req.params.id), time: Date.now()});
-    });
-  
-    server.post("/api/login", (req, res) => {
-      if (sha256password != crypto.createHash("sha256").update(req.body.password).digest("hex")) {
-        res.sendStatus(403);
-        console.log("Not allowed");
-        return;
-      }
-  
-      huxleyLogin(req.body.username, req.body.password);
-      clientToken = crypto.randomBytes(20).toString("hex");
-  
-      res.json(clientToken);
-    });
-  
-    server.post("/api/valid", (req, res) => {
-      res.json(clientToken == req.body.token);
-    });
-  
-    server.get("*", (req, res) => {
-      if (allowedExt.filter(ext => req.url.indexOf(ext) > 0).length > 0) {
-        res.sendFile(path.resolve("public" + req.url));
-      } else {
-        res.sendFile(path.resolve("public/index.html"));
-      }
-    });
-  
-    if (production) {
-      server.listen(process.env.PORT || 5000, () => {
-        console.log("Server running at http://${hostname}:${port}/");
-      });
+    }
+
+    saveDatabase();
+    res.json(competition);
+  });
+
+  server.patch("/api/competition/:competitionId/problem/:problemId", (req, res) => {
+    if (!authenticated(req.headers.token, res))
+      return;
+
+    var competition = getById(db["competitions"], req.params.competitionId);
+    if (competition) {
+      var problem = getById(competition.problems, req.params.problemId);
+      problem.color = req.body.color;
+    }
+
+    saveDatabase();
+    res.json(competition);
+  });
+
+  server.get("/api/standings/:id", (req, res) => {
+    res.json({standings: getById(db["competitions"], req.params.id), time: Date.now()});
+  });
+
+  server.post("/api/login", (req, res) => {
+    if (sha256password != crypto.createHash("sha256").update(req.body.password).digest("hex")) {
+      res.sendStatus(403);
+      console.log("Not allowed");
+      return;
+    }
+
+    huxleyLogin(req.body.username, req.body.password);
+    clientToken = crypto.randomBytes(20).toString("hex");
+
+    res.json(clientToken);
+  });
+
+  server.post("/api/valid", (req, res) => {
+    res.json(clientToken == req.body.token);
+  });
+
+  server.get("*", (req, res) => {
+    if (allowedExt.filter(ext => req.url.indexOf(ext) > 0).length > 0) {
+      res.sendFile(path.resolve("public" + req.url));
     } else {
-      server.listen(port, hostname, () => {
-        console.log(`Server running at http://${hostname}:${port}/`);
-      });
+      res.sendFile(path.resolve("public/index.html"));
     }
   });
+
+  if (production) {
+    server.listen(process.env.PORT || 5000, () => {
+      console.log("Server running at http://${hostname}:${port}/");
+    });
+  } else {
+    server.listen(port, hostname, () => {
+      console.log(`Server running at http://${hostname}:${port}/`);
+    });
+  }
 }
 
 initServer();
