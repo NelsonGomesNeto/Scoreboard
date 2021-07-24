@@ -175,7 +175,7 @@ function updateCompetitionsSubmissions() {
   }
 }
 
-function loadDatabase() {
+async function loadDatabase() {
   if (production) {
     db = {"competitions": []};
     try {
@@ -242,8 +242,8 @@ function authenticated(token, res) {
 }
 
 function reloader() {
-  loadDatabase();
-  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 3000);
+  setTimeout(() => setInterval(() => loadDatabase(), 10000), 3000);
+  // setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 3000);
 }
 
 function initServer() {
