@@ -183,7 +183,7 @@ async function loadDatabase() {
       console.log("query");
       pgdb.query("SELECT data FROM db", [], (err, data) => {
         if (err) {
-          console.log("Couldn't query", error);=
+          console.log("Couldn't query", error);
         } else {
           console.log("result:");
           console.log("data");
