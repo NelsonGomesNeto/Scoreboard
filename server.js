@@ -59,6 +59,7 @@ function huxleyLogin(username, password) {
       return;
     }
     huxleyToken = body["access_token"];
+    console.log(huxleyToken);
   });
 }
 
@@ -238,8 +239,13 @@ function authenticated(token, res) {
   return true;
 }
 
-async function initServer() {
-  await loadDatabase();
+function initServer() {
+  loadDatabase().then(() => initServer2())
+                .catch(() => {
+                  console.log("Database load failed");
+                });
+}
+function initServer2() {
   console.log("Successfully loaded database");
 
   setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
