@@ -17,7 +17,12 @@ const production = true;
 var pgdb;
 if (production) {
   pgdb = new Client({
-    connectionString: process.env.DATABASE_URL,
+    host: 'ec2-54-225-113-7.compute-1.amazonaws.com',
+    database: 'd1pnt8ase0npfn',
+    user: 'owptycjdwkohbe',
+    port: '5432',
+    password: '4fca17391d4ae7e9311d00db393409bb714f7358feedb0812fb22873c5890720',
+    // connectionString: process.env.DATABASE_URL,
     ssl: true,
   });
   pgdb.connect();
@@ -240,14 +245,7 @@ function authenticated(token, res) {
 }
 
 function initServer() {
-  loadDatabase().then(() => initServer2())
-                .catch(() => {
-                  console.log("Database load failed");
-                });
-}
-function initServer2() {
-  console.log("Successfully loaded database");
-
+  loadDatabase();
   setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000);
 
   huxleyToken = clientToken = null;
@@ -443,5 +441,4 @@ function initServer2() {
     });
   }
 }
-
 initServer();
