@@ -243,7 +243,7 @@ function authenticated(token, res) {
 
 function reloader() {
   loadDatabase();
-  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 10000 : 5000), 3000);
+  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 30000 : 5000), 3000);
 }
 
 function initServer() {
