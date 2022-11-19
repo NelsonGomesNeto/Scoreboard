@@ -2,6 +2,9 @@
   * Local build: `
     ng serve
   `
+  * Local build open to the public: `
+    ng serve --host 0.0.0.0
+  `
   * Production build: `
     ng build --prod=true
   `

@@ -11,7 +11,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { Client } = require("pg");
-const production = true;
+const production = false;
 
 // PRODUCTION DB
 var pgdb;
@@ -30,7 +30,7 @@ if (production) {
   });
 }
 
-const hostname = "localhost";
+const hostname = "0.0.0.0";
 const dbPath = "database/db.json";
 const huxley_url = "https://thehuxley.com/api";
 const sha256password = "9d0f22969bde723554a7f33afe897d2faa370165406dc8531d94384c5c610ec6";
@@ -243,7 +243,7 @@ function authenticated(token, res) {
 
 function reloader() {
   loadDatabase();
-  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 30000 : 5000), 3000);
+  setTimeout(() => setInterval(() => updateCompetitionsSubmissions(), production ? 30000 : 30000), 3000);
 }
 
 function initServer() {
@@ -261,14 +261,6 @@ function initServer2() {
   server.use(bodyParser.text());
   server.use(bodyParser.raw());
   server.use(bodyParser.urlencoded({extended: true}));
-  server.use(function(req, res, next) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS, POST, PUT, DELETE, PATCH");
-    res.setHeader("Access-Control-Allow-Headers", "content-type, token");
-    // res.setHeader("Content-Type", "application/json");
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    next();
-  });
 
   server.get("/api/competitions", (req, res) => {
     res.json({competitions: db["competitions"], time: Date.now()});
