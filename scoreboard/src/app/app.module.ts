@@ -11,7 +11,7 @@ import { MatSortModule, MatTableModule, MatCommonModule, MatFormFieldModule, Mat
 import { FormsModule } from '@angular/forms';
 import { LoginComponent } from './login/login.component';
 import { AuthenticationResolver } from './service/authentication/authentication-resolver';
-import { AmazingTimePickerModule } from 'amazing-time-picker';
+import { AmazingTimePickerModule } from '@jonijnm/amazing-time-picker';
 import { CompetitionsComponent } from './competitions/competitions.component';
 import { MccColorPickerModule } from 'material-community-components';
 
