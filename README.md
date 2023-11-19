@@ -1,7 +1,6 @@
 ## Stack
 
 ### Front-End: Angular 8
-  * AFAIK, there is no need to install dependencies!
   * Angular CLI version: 8.3.29 (required!).
     * `sudo npm install -g @angular/cli@8.3.5`
   * Local build: `
@@ -27,11 +26,15 @@
   `
 
 ### Database: PostgreSQL
+  * PostgreSQL version: 12.4 (required!)
+    * `sudo apt install postgresql-12 postgresql-client-12 pgadmin4`
+    * I prefer to configure everything over pgadmin4: `/usr/pgadmin4/bin/setup-web.sh`
+      * [Tutorial](https://www.cybrosys.com/blog/how-to-install-pgadmin-in-ubuntu)
   * Running locally will store on a single json file
     * Just because I'm too lazy to setup everything here tehe
   * Running on production will store stuff on PostgreSQL
 
-## Deploy
+## Servers
 
 ### Oracle cloud
 
@@ -45,3 +48,11 @@ Oracle cloud has a great freemium that is more than enough for this.
 * Check the Heroku log: `
   heroku logs --app huxley-scoreboard --tail
 `
+
+## Deploy
+1. Create a file `database_url` on the root folder of this repository.
+    * It must follow this pattern: `postgres://{username}:{password}@{host}:5432/{database}`.
+    * Do not commit this file!
+1. Compile the Front-End at `scoreboard` folder: `ng build --prod=true`.
+1. Run the Back-End: `node server.js`.
+    * The Back-End hosts the compiled Front-End.

@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   api_url: 'http://localhost:3000/api'
+  // api_url: 'http://144.22.158.183:3000/api'  // running on Oracle Cloud VM
 };
 
 /*

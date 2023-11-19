@@ -11,13 +11,15 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const { Client } = require("pg");
-const production = false;
+const production = true;
 
 // PRODUCTION DB
 var pgdb;
 if (production) {
+  var connectionString = fs.readFileSync('./database_url', { encoding: 'ascii', flag: 'r' });
   pgdb = new Client({
-    connectionString: process.env.DATABASE_URL,
+    // connectionString: process.env.DATABASE_URL,
+    connectionString: connectionString,
     ssl: true,
   });
   pgdb.connect();
@@ -427,14 +429,14 @@ function initServer2() {
     }
   });
 
-  if (production) {
-    server.listen(process.env.PORT || 5000, () => {
-      console.log(`Server running at http://${hostname}:${process.env.PORT}/`);
-    });
-  } else {
-    server.listen(port, hostname, () => {
-      console.log(`Server running at http://${hostname}:${port}/`);
-    });
-  }
+  // Old Heroku method to set a port.
+  // if (production) {
+  //   server.listen(process.env.PORT || 5000, () => {
+  //     console.log(`Server running at http://${hostname}:${process.env.PORT}/`);
+  //   });
+  // }
+  server.listen(port, hostname, () => {
+    console.log(`Server running at http://${hostname}:${port}/`);
+  });
 }
 initServer();
